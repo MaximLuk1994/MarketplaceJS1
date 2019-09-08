@@ -1,4 +1,28 @@
 window.addEventListener('DOMContentLoaded', () => {
+
+    function createElement(arr) {
+        const goodsWrapper = document.querySelector('.goods');
+        arr.forEach(function(item) {
+            let card = document.createElement('div');
+            card.classList.add('productcard');
+            card.innerHTML = `
+                <div class="productcard__id"></div>
+                <div class="productcard__sale is-hidden">${item.sale}</div>
+                <div class="productcard__img">
+                    <img src="${item.img}" alt="image">
+                    <div class="productcard__added is-hidden">Добавлено!</div>
+                </div>                                                
+                <div class="productcard__details">
+                    <div class="productcard__price">${item.price}</div>
+                    <div class="productcard__category">${item.category}</div>
+                    <div class="productcard__title">${item.title}</div>
+                </div>                         
+                <button class="productcard__btn-buy btn">Купить</button>
+            `;
+            goodsWrapper.appendChild(card);
+        });
+    }
+
     const cartOpenBtn = document.getElementById('cart'),
         cart = document.querySelector('.cart'),
         cartWrapper = document.querySelector('.cart__wrapper'),
@@ -6,7 +30,10 @@ window.addEventListener('DOMContentLoaded', () => {
         cartEmpty = document.querySelector('.empty'),
         goods = document.querySelectorAll('.productcard'),
         quantity = document.querySelector('#quantity'),
-        cleanBtn = document.getElementById('cleanBtn');
+        cleanBtn = document.getElementById('cleanBtn'),
+        titles = document.querySelectorAll('.productcard__title');
+
+    let cartTotal = cart.querySelector('.cart__total :first-child span');
 
 
     function openCart() {
@@ -19,8 +46,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function countCart() {
-        count = cartWrapper.querySelectorAll('.productcard');
-        quantity.innerText = count.length;
+        const cartGoods = cartWrapper.querySelectorAll('.productcard');
+        quantity.innerText = cartGoods.length;
+    }
+
+    function countTotal() {
+        const cartGoods = cartWrapper.querySelectorAll('.productcard');
+        let total = 0;
+        cartGoods.forEach(card => {
+            const price = card.querySelector('.productcard__price');
+            total += +price.textContent;
+        });
+        cartTotal.textContent = total;
     }
 
     function cleanCart() {
@@ -51,6 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
     goods.forEach(card => {
         const addBtn = card.querySelector('.productcard__btn-buy'),
             addedImg = card.querySelector('.productcard__added');
+
         addBtn.addEventListener('click', async () => {
             const cardClone = card.cloneNode(true);
             removeBtn = cardClone.querySelector('.productcard__btn-buy');
@@ -61,10 +99,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 cardClone.remove();
                 countCart();
                 refreshEmpty();
+                countTotal();
             });
             await cartWrapper.appendChild(cardClone);
             countCart();
             refreshEmpty();
+            countTotal();
 
             addedImg.classList.remove('is-hidden');
             setTimeout(() => addedImg.classList.add('is-hidden'), 500);
@@ -74,6 +114,19 @@ window.addEventListener('DOMContentLoaded', () => {
     cartOpenBtn.addEventListener('click', openCart);
     cartCloseBtn.addEventListener('click', closeCart);
     cleanBtn.addEventListener('click', cleanCart);
+
+    function sliceTitle() {
+        titles.forEach(function(item) {
+            if (item.textContent.length <= 70) {
+                return;
+            } 
+            else {
+                const str = `${item.textContent.slice(0, 67)}...`;
+                item.textContent = str;
+            }
+        });
+    }
+    sliceTitle();
     
 
 });
