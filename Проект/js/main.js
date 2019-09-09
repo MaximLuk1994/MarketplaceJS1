@@ -14,8 +14,8 @@ window.addEventListener('DOMContentLoaded', () => {
         arr.forEach(function(item) {
             let card = document.createElement('div');
             card.classList.add('productcard');
+            card.setAttribute("data-id", item.id);
             card.innerHTML = `
-                <div class="productcard__id"></div>
                 <div class="productcard__sale is-hidden">${item.sale}</div>
                 <div class="productcard__img">
                     <img src="${item.img}" alt="image">
@@ -40,11 +40,15 @@ window.addEventListener('DOMContentLoaded', () => {
             cartCloseBtn = cart.querySelector('.cart__close'),
             cartEmpty = document.querySelector('.empty'),
             goods = document.querySelectorAll('.productcard'),
-            quantity = document.querySelector('#quantity'),
+            cartQuantity = document.querySelector('#quantity'),
             cleanBtn = document.getElementById('cleanBtn'),
             titles = document.querySelectorAll('.productcard__title');
 
         let cartTotal = cart.querySelector('.cart__total :first-child span');
+
+        // Когда объявляю тут эту переменную, при каждом нажатии на кнопку другого товара обнуляются изменения в записанном элементе, заданные нажатием кнопки предыдущего
+        // const productQuantity = document.createElement('div');
+        // productQuantity.classList.add('productcard__quantity');
 
 
         function openCart() {
@@ -56,17 +60,26 @@ window.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = "";
         }
 
-        function countCart() {
+        // Количество товаров в корзине:
+        function countCart() { // Пересчитать по наполнениям .productcard__quantity
             const cartGoods = cartWrapper.querySelectorAll('.productcard');
-            quantity.innerText = cartGoods.length;
+            let counter = 0;
+            // cartQuantity.innerText = cartGoods.length; // Старый расчёт
+            cartGoods.forEach(card => {
+                const quantity = card.querySelector('.productcard__quantity');
+                counter+= +quantity.textContent;
+            });
+            cartQuantity.textContent = counter;
         }
 
-        function countTotal() {
+        //Общая стоимость в корзине:
+        function countTotal() { // Пересчитать с умножением на .productcard__quantity
             const cartGoods = cartWrapper.querySelectorAll('.productcard');
             let total = 0;
             cartGoods.forEach(card => {
                 const price = card.querySelector('.productcard__price');
-                total += +price.textContent;
+                const quantity = card.querySelector('.productcard__quantity');
+                total += +price.textContent * +quantity.textContent;
             });
             cartTotal.textContent = total;
         }
@@ -87,38 +100,67 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (cart.querySelector('.empty')) {
                     cart.querySelector('.empty').remove();
                 }            
-                quantity.classList.remove('is-hidden');
+                cartQuantity.classList.remove('is-hidden');
                 cleanBtn.classList.remove('is-hidden');
             } else if (!cart.querySelector('.empty')) {
                 cartWrapper.appendChild(cartEmpty);
-                quantity.classList.add('is-hidden');
+                cartQuantity.classList.add('is-hidden');
                 cleanBtn.classList.add('is-hidden');
             }
         }
 
+        function refreshAll() {
+            countCart();
+            refreshEmpty();
+            countTotal();
+        }
+
+        function checkProduct(id) {
+            const checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
+            return Boolean(checkedProduct);
+        }
+
+        function quantityIncrease(id) {
+            const checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
+            const quantity = checkedProduct.querySelector('.productcard__quantity');   
+            quantity.innerText = +quantity.innerText + 1;       
+            // console.log(quantity.innerText);
+            refreshAll();  
+        }
+
         goods.forEach(card => {
             const addBtn = card.querySelector('.productcard__btn-buy'),
-                addedImg = card.querySelector('.productcard__added');
+                addedImg = card.querySelector('.productcard__added'),
+                productId = card.dataset.id;
+                // console.log(productId); // Проверка
 
-            addBtn.addEventListener('click', async () => {
-                const cardClone = card.cloneNode(true);
-                removeBtn = cardClone.querySelector('.productcard__btn-buy');
-                addedImgClone = cardClone.querySelector('.productcard__added');
-                if (addedImgClone) addedImgClone.remove();
-                removeBtn.textContent = 'Удалить';
-                removeBtn.addEventListener('click', () => {
-                    cardClone.remove();
-                    countCart();
-                    refreshEmpty();
-                    countTotal();
-                });
-                await cartWrapper.appendChild(cardClone); //? Как правильно записать функцию так, чтобы последующий код выполнился именно после добавления нового элемента?
-                countCart();
-                refreshEmpty();
-                countTotal();
+            addBtn.addEventListener('click', () => {
+                if (checkProduct(productId)) {
+                    quantityIncrease(productId);
+                } else {
+                    const cardClone = card.cloneNode(true),
+                        removeBtn = cardClone.querySelector('.productcard__btn-buy'),
+                        addedImgClone = cardClone.querySelector('.productcard__added'),
+                        detailsWrapper = cardClone.querySelector('.productcard__details');
+                    // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке^
+                    if (addedImgClone) addedImgClone.remove();
+                    removeBtn.textContent = 'Удалить';
+                    removeBtn.addEventListener('click', () => {
+                        cardClone.remove();
+                        refreshAll();
+                    });
+                    const productQuantity = document.createElement('div');
+                    productQuantity.classList.add('productcard__quantity');
+                    detailsWrapper.appendChild(productQuantity); //! Куда оно исчезает, когда нажимаю на кнопку другого товара??
+                    cardClone.querySelector('.productcard__quantity').innerText = '1';
+                    cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
+                    refreshAll();
+    
+                    addedImg.classList.remove('is-hidden');
+                    setTimeout(() => addedImg.classList.add('is-hidden'), 500);
+                }
 
-                addedImg.classList.remove('is-hidden');
-                setTimeout(() => addedImg.classList.add('is-hidden'), 500);
+                
             });
         });
 
