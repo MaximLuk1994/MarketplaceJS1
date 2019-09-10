@@ -188,11 +188,10 @@ window.addEventListener('DOMContentLoaded', () => {
                     cardClone.querySelector('.productcard__quantity').value = 1;
                     cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
                     refreshAll();
-    
-                    addedImg.classList.remove('is-hidden');
-                    setTimeout(() => addedImg.classList.add('is-hidden'), 500);
                 }
 
+                addedImg.classList.remove('is-hidden');
+                setTimeout(() => addedImg.classList.add('is-hidden'), 500);
                 
             });
         });
