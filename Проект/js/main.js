@@ -42,7 +42,9 @@ window.addEventListener('DOMContentLoaded', () => {
             goods = document.querySelectorAll('.productcard'),
             cartQuantity = document.querySelector('#quantity'),
             cleanBtn = document.getElementById('cleanBtn'),
-            titles = document.querySelectorAll('.productcard__title');
+            selectAllCheckbox = document.getElementById('selectAll'),
+            titles = document.querySelectorAll('.productcard__title'),
+            cartSelect = cart.querySelector('.cart__select');
 
         let cartTotal = cart.querySelector('.cart__total :first-child span');
 
@@ -61,37 +63,26 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         // Количество товаров в корзине:
-        function countCart() { // Пересчитать по наполнениям .productcard__quantity
+        function countCart() {
             const cartGoods = cartWrapper.querySelectorAll('.productcard');
             let counter = 0;
-            // cartQuantity.innerText = cartGoods.length; // Старый расчёт
             cartGoods.forEach(card => {
                 const quantity = card.querySelector('.productcard__quantity');
-                counter+= +quantity.textContent;
+                counter+= +quantity.value;
             });
             cartQuantity.textContent = counter;
         }
 
         //Общая стоимость в корзине:
-        function countTotal() { // Пересчитать с умножением на .productcard__quantity
+        function countTotal() {
             const cartGoods = cartWrapper.querySelectorAll('.productcard');
             let total = 0;
             cartGoods.forEach(card => {
                 const price = card.querySelector('.productcard__price');
                 const quantity = card.querySelector('.productcard__quantity');
-                total += +price.textContent * +quantity.textContent;
+                total += +price.textContent * quantity.value;
             });
             cartTotal.textContent = total;
-        }
-
-        function cleanCart() {
-            const cartGoods = cartWrapper.querySelectorAll('.productcard');
-            if (cartGoods.length > 0) {
-                let clean = confirm("Вы уверены, что хотите очистить корзину?");
-                if (clean) cartWrapper.innerHTML = "";
-                countCart();
-                refreshEmpty();
-            }
         }
 
         function refreshEmpty() {
@@ -102,10 +93,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 }            
                 cartQuantity.classList.remove('is-hidden');
                 cleanBtn.classList.remove('is-hidden');
+                cartSelect.classList.remove('is-hidden');
             } else if (!cart.querySelector('.empty')) {
                 cartWrapper.appendChild(cartEmpty);
                 cartQuantity.classList.add('is-hidden');
                 cleanBtn.classList.add('is-hidden');
+                cartSelect.classList.add('is-hidden');
             }
         }
 
@@ -113,6 +106,23 @@ window.addEventListener('DOMContentLoaded', () => {
             countCart();
             refreshEmpty();
             countTotal();
+        }
+
+        function cleanCart() {
+            const cartGoods = cartWrapper.querySelectorAll('.productcard');
+            const cardsSelected = cartWrapper.querySelectorAll('.productcard__to-clean:checked');
+            if (cardsSelected.length > 0) {
+                let clean = confirm("Вы уверены, что хотите удалить выбранные товары?");
+                if (clean) {
+                    cartGoods.forEach(card => {
+                        toClean = card.querySelector('.productcard__to-clean');
+                        if(toClean.checked) card.remove();
+                    });
+                    refreshAll();         
+                }
+            } else {
+                alert("Выберите, какие товары удалить из корзины");
+            }
         }
 
         function checkProduct(id) {
@@ -123,9 +133,22 @@ window.addEventListener('DOMContentLoaded', () => {
         function quantityIncrease(id) {
             const checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
             const quantity = checkedProduct.querySelector('.productcard__quantity');   
-            quantity.innerText = +quantity.innerText + 1;       
+            quantity.value++;       
             // console.log(quantity.innerText);
             refreshAll();  
+        }
+
+        function selectAll() {
+            const cartGoods = cartWrapper.querySelectorAll('.productcard');
+            if (selectAllCheckbox.checked) {
+                cartGoods.forEach(card => {
+                    card.querySelector('.productcard__to-clean').checked = true;
+                });
+            } else {
+                cartGoods.forEach(card => {
+                    card.querySelector('.productcard__to-clean').checked = false;
+                });
+            }
         }
 
         goods.forEach(card => {
@@ -142,17 +165,27 @@ window.addEventListener('DOMContentLoaded', () => {
                         removeBtn = cardClone.querySelector('.productcard__btn-buy'),
                         addedImgClone = cardClone.querySelector('.productcard__added'),
                         detailsWrapper = cardClone.querySelector('.productcard__details');
-                    // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке^
-                    if (addedImgClone) addedImgClone.remove();
+                    if (addedImgClone) addedImgClone.remove(); // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке
                     removeBtn.textContent = 'Удалить';
                     removeBtn.addEventListener('click', () => {
                         cardClone.remove();
                         refreshAll();
                     });
-                    const productQuantity = document.createElement('div');
+                    // Добавляем количество товара
+                    const productQuantity = document.createElement('input');
+                    productQuantity.setAttribute('type', 'number');
+                    productQuantity.setAttribute('min', 1);
                     productQuantity.classList.add('productcard__quantity');
-                    detailsWrapper.appendChild(productQuantity); //! Куда оно исчезает, когда нажимаю на кнопку другого товара??
-                    cardClone.querySelector('.productcard__quantity').innerText = '1';
+                    productQuantity.addEventListener('change', refreshAll);
+                    detailsWrapper.appendChild(productQuantity);
+                    
+                    //Создаём селекты
+                    const productSelect = document.createElement('input');
+                    productSelect.setAttribute('type', 'checkbox');
+                    productSelect.classList.add('productcard__to-clean');
+                    cardClone.appendChild(productSelect);
+
+                    cardClone.querySelector('.productcard__quantity').value = 1;
                     cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
                     refreshAll();
     
@@ -167,6 +200,7 @@ window.addEventListener('DOMContentLoaded', () => {
         cartOpenBtn.addEventListener('click', openCart);
         cartCloseBtn.addEventListener('click', closeCart);
         cleanBtn.addEventListener('click', cleanCart);
+        selectAllCheckbox.addEventListener('change', selectAll);
 
         function sliceTitle() {
             titles.forEach(function(item) {
