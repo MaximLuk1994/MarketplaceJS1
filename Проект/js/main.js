@@ -113,15 +113,16 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         function toggleSettings() {
-            const searchBtn = document.getElementById('search');
-            searchBtn.parentElement.addEventListener('submit', (e) => {
-                event.preventDefault();
-                return false; //? Нужно ли это?
-            });
+            // const searchBtn = document.getElementById('search');
+            // searchBtn.parentElement.addEventListener('submit', (e) => {
+            //     event.preventDefault();
+            //     return false; //? Нужно ли это?
+            // });
         }
 
         function toggleAddCart() {
-            const goods = document.querySelectorAll('.productcard'),
+            const goodsWrapper = document.querySelector('.goods'),
+                goods = goodsWrapper.querySelectorAll('.productcard'),
                 cartWrapper = document.querySelector('.cart__wrapper');
             goods.forEach(card => {
                 const addBtn = card.querySelector('.productcard__btn-buy'),
@@ -251,9 +252,9 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         function toggleFilter() {
-            const goods = document.querySelectorAll('.productcard');
+            const goodsWrapper = document.querySelector('.goods'),
+                goods = goodsWrapper.querySelectorAll('.productcard'),
                 discountCheckbox = document.querySelector('#discount-checkbox'),
-                goodsWrapper = document.querySelector('.goods'),
                 min = document.getElementById('min'),
                 max = document.getElementById('max'),
                 searchBtn = document.querySelector('#search');
@@ -303,25 +304,28 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             discountCheckbox.addEventListener('change', () => {                
                 checkDiscount(goods);
-                checkPrice(document.querySelectorAll('.productcard'));
-                checkSearch(document.querySelectorAll('.productcard'));
+                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
             });
         
             function filterPrice() {
                 checkDiscount(goods);
-                checkPrice(document.querySelectorAll('.productcard'));
-                checkSearch(document.querySelectorAll('.productcard'));
+                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
             }
         
             min.addEventListener('change', filterPrice);
             max.addEventListener('change', filterPrice);
         
             // Лучше бы это была форма и привязывали бы к сабмиту
-            searchBtn.addEventListener('click', () => {
+            searchBtn.parentElement.addEventListener('submit', (e) => {
+                event.preventDefault();
                 checkDiscount(goods);
-                checkPrice(document.querySelectorAll('.productcard'));
-                checkSearch(document.querySelectorAll('.productcard'));
+                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                return false; // Надо ли?
             });
+
         }
 
 
