@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
             let card = document.createElement('div');
             card.classList.add('productcard');
             card.setAttribute("data-id", item.id);
+            card.setAttribute("data-sale", item.sale);
             card.innerHTML = `
                 <div class="productcard__img">
                     <img src="${item.img}" alt="image">
@@ -249,12 +250,87 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function toggleFilter() {
+            const goods = document.querySelectorAll('.productcard');
+                discountCheckbox = document.querySelector('#discount-checkbox'),
+                goodsWrapper = document.querySelector('.goods'),
+                min = document.getElementById('min'),
+                max = document.getElementById('max'),
+                searchBtn = document.querySelector('#search');
+                searchInput = searchBtn.previousElementSibling;
+        
+            function checkDiscount(toFilter) {
+                // const goods = document.querySelectorAll('.productcard');
+                toFilter.forEach(el => {
+                    const isSale = el.getAttribute("data-sale");
+                    if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
+                        if (isSale=='false') {
+                            el.remove();
+                        }        
+                    } else {
+                        goodsWrapper.appendChild(el);
+                    }
+                });
+            }
+
+            function checkPrice(toFilter) {
+                // const goods = document.querySelectorAll('.productcard');
+                toFilter.forEach((el) => {
+                    const cardPrice = el.querySelector('.productcard__price');
+                    const price = parseFloat(cardPrice.textContent);
+                    // console.log(price);
+                    if ((min.value && price <= min.value) || (max.value && price >= max.value)) {
+                        el.remove();
+                    } else {
+                        goodsWrapper.appendChild(el);
+                    }
+                });
+            }
+
+            function checkSearch(toFilter) {
+                const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
+                // const goods = document.querySelectorAll('.productcard');
+                // метод trim() убирает лишние пробелы по бокам
+                // console.log(searchText);
+                toFilter.forEach((el) => {
+                    const title = el.querySelector('.productcard__title');
+                    if (!searchText.test(title.textContent)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
+                        el.remove();
+                    } else {
+                        goodsWrapper.appendChild(el);
+                    }
+                });
+            }
+            discountCheckbox.addEventListener('change', () => {                
+                checkDiscount(goods);
+                checkPrice(document.querySelectorAll('.productcard'));
+                checkSearch(document.querySelectorAll('.productcard'));
+            });
+        
+            function filterPrice() {
+                checkDiscount(goods);
+                checkPrice(document.querySelectorAll('.productcard'));
+                checkSearch(document.querySelectorAll('.productcard'));
+            }
+        
+            min.addEventListener('change', filterPrice);
+            max.addEventListener('change', filterPrice);
+        
+            // Лучше бы это была форма и привязывали бы к сабмиту
+            searchBtn.addEventListener('click', () => {
+                checkDiscount(goods);
+                checkPrice(document.querySelectorAll('.productcard'));
+                checkSearch(document.querySelectorAll('.productcard'));
+            });
+        }
+
 
         toggleCart();
         toggleCheckbox();
         toggleAddCart();
         sliceTitle();
         toggleSettings();
+        toggleFilter();
     });
 
     
