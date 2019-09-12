@@ -35,93 +35,82 @@ window.addEventListener('DOMContentLoaded', () => {
 
     loadContent('db/db.json', () =>{ //? Почему работает только с запуском сервера, а в ином случае ругается?
 
+        const cart = document.querySelector('.cart'),
+            cartWrapper = document.querySelector('.cart__wrapper'),
+            cartQuantity = document.querySelector('#quantity'),
+            cleanBtn = document.getElementById('cleanBtn');
+
         // Когда объявляю тут эту переменную, при каждом нажатии на кнопку другого товара обнуляются изменения в записанном элементе, заданные нажатием кнопки предыдущего
         // const productQuantity = document.createElement('div');
         // productQuantity.classList.add('productcard__quantity');
 
+
         
 
-        //* 1. Обновление счётчика количества товаров в корзине, общей стоимости и надписи "Корзина пуста"
-        function refreshAll() {
-
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                cartGoods = cartWrapper.querySelectorAll('.productcard'),
-                cartQuantity = document.querySelector('#quantity'),
-                cart = document.querySelector('.cart');
-            // 1.1. Количество товаров в корзине:
-            function countCart() {
-                let counter = 0;
-                cartGoods.forEach(card => {
-                    const quantity = card.querySelector('.productcard__quantity');
-                    counter+= +quantity.value;
-                });
-                cartQuantity.textContent = counter;
-            }
-
-            // 1.2. Общая стоимость в корзине:
-            function countTotal() {
-                const cartTotal = cart.querySelector('.cart__total :first-child span');
-                let total = 0;
-                cartGoods.forEach(card => {
-                    const price = card.querySelector('.productcard__price');
-                    const quantity = card.querySelector('.productcard__quantity');
-                    total += +price.textContent * quantity.value;
-                });
-                cartTotal.textContent = total;
-            }
-
-            // 1.3. Надпись "Корзина пуста"
-            function refreshEmpty() {
-                const cartSelect = cart.querySelector('.cart__select'),
-                    cartEmpty = document.querySelector('.empty'),
-                    cleanBtn = document.getElementById('cleanBtn');
-                if (cartGoods.length > 0) {
-                    if (cart.querySelector('.empty')) {
-                        cart.querySelector('.empty').remove();
-                    }            
-                    cartQuantity.classList.remove('is-hidden');
-                    cleanBtn.classList.remove('is-hidden');
-                    cartSelect.classList.remove('is-hidden');
-                } else if (!cart.querySelector('.empty')) {
-                    cartWrapper.appendChild(cartEmpty);
-                    cartQuantity.classList.add('is-hidden');
-                    cleanBtn.classList.add('is-hidden');
-                    cartSelect.classList.add('is-hidden');
-                }
-            }
-            countCart();
-            refreshEmpty();
-            countTotal();        
+        // Количество товаров в корзине:
+        function countCart() {
+            const cartGoods = cartWrapper.querySelectorAll('.productcard');
+            let counter = 0;
+            cartGoods.forEach(card => {
+                const quantity = card.querySelector('.productcard__quantity');
+                counter+= +quantity.value;
+            });
+            cartQuantity.textContent = counter;
         }
 
-        //* Проверка, есть ли товар с таким ID
+        //Общая стоимость в корзине:
+        function countTotal() {
+            const cartGoods = cartWrapper.querySelectorAll('.productcard'),
+                cartTotal = cart.querySelector('.cart__total :first-child span');
+            let total = 0;
+            cartGoods.forEach(card => {
+                const price = card.querySelector('.productcard__price');
+                const quantity = card.querySelector('.productcard__quantity');
+                total += +price.textContent * quantity.value;
+            });
+            cartTotal.textContent = total;
+        }
+
+        function refreshEmpty() {
+            const cartGoods = cartWrapper.querySelectorAll('.productcard'),
+                cartSelect = cart.querySelector('.cart__select'),
+                cartEmpty = document.querySelector('.empty');
+            if (cartGoods.length > 0) {
+                if (cart.querySelector('.empty')) {
+                    cart.querySelector('.empty').remove();
+                }            
+                cartQuantity.classList.remove('is-hidden');
+                cleanBtn.classList.remove('is-hidden');
+                cartSelect.classList.remove('is-hidden');
+            } else if (!cart.querySelector('.empty')) {
+                cartWrapper.appendChild(cartEmpty);
+                cartQuantity.classList.add('is-hidden');
+                cleanBtn.classList.add('is-hidden');
+                cartSelect.classList.add('is-hidden');
+            }
+        }
+
+        function refreshAll() {
+            countCart();
+            refreshEmpty();
+            countTotal();
+        }
+
         function checkProduct(id) {
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
+            const checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
             return Boolean(checkedProduct);
         }
 
-        //* Увеличение счётчика товара в корзине на 1 по
         function quantityIncrease(id) {
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`),
-                quantity = checkedProduct.querySelector('.productcard__quantity');   
+            const checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
+            const quantity = checkedProduct.querySelector('.productcard__quantity');   
             quantity.value++;       
             // console.log(quantity.innerText);
             refreshAll();  
         }
 
-        function toggleSettings() {
-            const searchBtn = document.getElementById('search');
-            searchBtn.parentElement.addEventListener('submit', (e) => {
-                event.preventDefault();
-                return false; //? Нужно ли это?
-            });
-        }
-
-        function toggleAddCart() {
-            const goods = document.querySelectorAll('.productcard'),
-                cartWrapper = document.querySelector('.cart__wrapper');
+        function addToCart() {
+            const goods = document.querySelectorAll('.productcard');
             goods.forEach(card => {
                 const addBtn = card.querySelector('.productcard__btn-buy'),
                     addedImg = card.querySelector('.productcard__added'),
@@ -170,10 +159,9 @@ window.addEventListener('DOMContentLoaded', () => {
         
         function toggleCart() {
             const cartOpenBtn = document.getElementById('cart'),
-                cart = document.querySelector('.cart')
                 cartCloseBtn = cart.querySelector('.cart__close'),
-                cartWrapper = cart.querySelector('.cart__wrapper'),
                 cleanBtn = document.getElementById('cleanBtn'),
+                cartGoods = cartWrapper.querySelectorAll('.productcard'),
                 selectAllCheckbox = document.getElementById('selectAll');
 
             function openCart() {
@@ -186,8 +174,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             function cleanCart() {
-                const cardsSelected = cartWrapper.querySelectorAll('.productcard__to-clean:checked'),
-                    cartGoods = cartWrapper.querySelectorAll('.productcard');
+                const cardsSelected = cartWrapper.querySelectorAll('.productcard__to-clean:checked');
                 if (cardsSelected.length > 0) {
                     let clean = confirm("Вы уверены, что хотите удалить выбранные товары?");
                     if (clean) {
@@ -203,7 +190,6 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
             function selectAll() {
-                const cartGoods = cartWrapper.querySelectorAll('.productcard');
                 if (selectAllCheckbox.checked) {
                     cartGoods.forEach(card => {
                         card.querySelector('.productcard__to-clean').checked = true;
@@ -221,7 +207,9 @@ window.addEventListener('DOMContentLoaded', () => {
             selectAllCheckbox.addEventListener('change', selectAll);
         }
 
-        // Сокращение названий
+        
+        
+
         function sliceTitle() {
             const titles = document.querySelectorAll('.productcard__title');
             titles.forEach(function(item) {
@@ -249,12 +237,11 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-
         toggleCart();
         toggleCheckbox();
-        toggleAddCart();
+        addToCart();
         sliceTitle();
-        toggleSettings();
+
     });
 
     
