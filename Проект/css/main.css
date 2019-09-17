@@ -325,7 +325,7 @@ input.productcard__quantity {
     margin-top: 15%
 }
 
-.filter-price_title {
+.filter-price_title, .filter-category_title {
     display: block;
     font-size: 14px;
     line-height: 13px;
@@ -333,7 +333,7 @@ input.productcard__quantity {
     font-weight: 700
 }
 
-.filter-price_range {
+.filter-price_range, .filter-category_select {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;

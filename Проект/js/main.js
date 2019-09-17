@@ -40,7 +40,10 @@ window.addEventListener('DOMContentLoaded', () => {
         // const productQuantity = document.createElement('div');
         // productQuantity.classList.add('productcard__quantity');
 
-        
+        //* Общие элементы, которые будут удаляться и возвращаться:
+        const cartEmpty = document.querySelector('.empty');
+        // Сюда же можно добавить все счётчики, чтобы они не были скрытыми элементами в вёрстке
+
 
         //* 1. Обновление счётчика количества товаров в корзине, общей стоимости и надписи "Корзина пуста"
         function refreshAll() {
@@ -74,7 +77,6 @@ window.addEventListener('DOMContentLoaded', () => {
             // 1.3. Надпись "Корзина пуста"
             function refreshEmpty() {
                 const cartSelect = cart.querySelector('.cart__select'),
-                    cartEmpty = document.querySelector('.empty'),
                     cleanBtn = document.getElementById('cleanBtn');
                 if (cartGoods.length > 0) {
                     if (cart.querySelector('.empty')) {
@@ -251,14 +253,37 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function toggleCategory() {
+            const catSelect = document.querySelector('.filter-category_select'),
+                goodsWrapper = document.querySelector('.goods'),
+                categories = goodsWrapper.querySelectorAll('.productcard__category');
+                // categories.forEach(cat => {
+                //     const catOption = document.createElement('option');
+                //     catOption.setAttribute('value', cat.textContent);
+                //     catOption.textContent = cat.textContent;
+                //     catSelect.appendChild(catOption);
+                // });
+                categories.forEach(cat => {
+                    if (catSelect.querySelector(`option[value = '${cat.textContent}']`)) {
+                        // return false; //? Надо ли это?
+                    } else {
+                        const catOption = document.createElement('option');
+                        catOption.setAttribute('value', cat.textContent);
+                        catOption.textContent = cat.textContent;
+                        catSelect.appendChild(catOption);
+                    }                    
+                });
+        }
+
         function toggleFilter() {
             const goodsWrapper = document.querySelector('.goods'),
                 goods = goodsWrapper.querySelectorAll('.productcard'),
                 discountCheckbox = document.querySelector('#discount-checkbox'),
                 min = document.getElementById('min'),
                 max = document.getElementById('max'),
-                searchBtn = document.querySelector('#search');
-                searchInput = searchBtn.previousElementSibling;
+                searchBtn = document.querySelector('#search'),
+                searchInput = searchBtn.previousElementSibling,
+                catSelect = document.querySelector('.filter-category_select');
         
             function checkDiscount(toFilter) {
                 // const goods = document.querySelectorAll('.productcard');
@@ -302,16 +327,39 @@ window.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             }
-            discountCheckbox.addEventListener('change', () => {                
+
+            function checkCategory(toFilter) {
+                toFilter.forEach(el =>{
+                    const cardCategory = el.querySelector('.productcard__category');
+                    if (cardCategory.innerText !== catSelect.value && catSelect.value !== "all") {
+                        el.remove();
+                    } else {
+                        goodsWrapper.appendChild(el);
+                    }
+                });
+            }
+
+            function checkAll() {
                 checkDiscount(goods);
                 checkPrice(goodsWrapper.querySelectorAll('.productcard'));
                 checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+            }
+
+            discountCheckbox.addEventListener('change', () => {                
+                // checkDiscount(goods);
+                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                checkAll();
             });
         
             function filterPrice() {
-                checkDiscount(goods);
-                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkDiscount(goods);
+                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                checkAll();
             }
         
             min.addEventListener('change', filterPrice);
@@ -320,10 +368,20 @@ window.addEventListener('DOMContentLoaded', () => {
             // Лучше бы это была форма и привязывали бы к сабмиту
             searchBtn.parentElement.addEventListener('submit', (e) => {
                 event.preventDefault();
-                checkDiscount(goods);
-                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                return false; // Надо ли?
+                // checkDiscount(goods);
+                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                checkAll();
+                // return false; // Надо ли? - НЕТ
+            });
+
+            catSelect.addEventListener('change', () => {
+                // checkDiscount(goods);
+                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                checkAll();
             });
 
         }
@@ -334,6 +392,7 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleAddCart();
         sliceTitle();
         toggleSettings();
+        toggleCategory();
         toggleFilter();
     });
 
