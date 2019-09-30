@@ -11,12 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     class ProductCard {
         constructor(id, sale, img, price, category, title) {
-            this.id = id;
-            this.sale = sale;
-            this.img = img;
-            this.price = price;
-            this.category = category;
-            this.title = title;
+            this.params = {id, sale, img, price, category, title};
             this.template = `
                 <div class="productcard__img">
                     <img src="${img}" alt="image">
@@ -30,6 +25,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>                         
                 <button class="productcard__btn-buy btn">Купить</button>
             `;
+            this.elems = {};
+            this.elems.card = {};
+            this.elems.shortcard = {};
+            this.cartInfo = {inCart: 0}; // Сюда потом могу вытягивать инфу из куков
         }
         create() {
             let card = document.createElement('div');
@@ -38,21 +37,66 @@ window.addEventListener('DOMContentLoaded', () => {
             card.setAttribute("data-sale", this.sale);
             card.innerHTML = this.template;
             this.card = card;
+
+            this.elems.card.addBtn = this.card.querySelector('.productcard__btn-buy');
+            addEventListener('click', addToCart);
         }
         checkSale() {
-            if (this.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+        }
+    }
+
+    function addToCart() {
+        if (checkProduct(this.params.id)) {
+            quantityIncrease(this.params.id);
+        } else {
+            const cardClone = this.card.cloneNode(true),
+                removeBtn = cardClone.querySelector('.productcard__btn-buy'),
+                addedImgClone = cardClone.querySelector('.productcard__added');
+            if (addedImgClone) addedImgClone.remove(); // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке
+            removeBtn.textContent = 'Удалить';
+            removeBtn.classList.remove('productcard__btn-buy');
+            removeBtn.classList.add('productcard__btn-remove');
+            removeBtn.addEventListener('click', () => {
+                cardClone.remove();
+                refreshAll();
+            });
+            // Добавляем количество товара
+            const productQuantity = document.createElement('input'),
+                detailsWrapper = cardClone.querySelector('.productcard__details');
+            productQuantity.setAttribute('type', 'number');
+            productQuantity.setAttribute('min', 1);
+            productQuantity.classList.add('productcard__quantity');
+            productQuantity.addEventListener('change', refreshAll);
+            detailsWrapper.appendChild(productQuantity);
+            
+            //Создаём селекты
+            const productSelect = document.createElement('input');
+            productSelect.setAttribute('type', 'checkbox');
+            productSelect.classList.add('productcard__to-clean');
+            cardClone.appendChild(productSelect);
+
+            cardClone.querySelector('.productcard__quantity').value = 1;
+            cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
+            refreshAll();
         }
 
+        addedImg.classList.remove('is-hidden');
+        setTimeout(() => addedImg.classList.add('is-hidden'), 500);
     }
 
     function createElement(arr) {
         const goodsWrapper = document.querySelector('.goods');
+        let goodsArr = {};
+        let cartArr = {};
         arr.forEach(function(item) {
             let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
             product.create();
             product.checkSale();
             goodsWrapper.appendChild(product.card);
+            goodsArr[item.id] = product;
         });
+        // console.log(goodsArr);
     }
 
     loadContent('db/db.json', () =>{ //? Почему работает только с запуском сервера, а в ином случае ругается?
@@ -141,56 +185,6 @@ window.addEventListener('DOMContentLoaded', () => {
             //     event.preventDefault();
             //     return false; //? Нужно ли это?
             // });
-        }
-
-        function toggleAddCart() {
-            const goodsWrapper = document.querySelector('.goods'),
-                goods = goodsWrapper.querySelectorAll('.productcard'),
-                cartWrapper = document.querySelector('.cart__wrapper');
-            goods.forEach(card => {
-                const addBtn = card.querySelector('.productcard__btn-buy'),
-                    addedImg = card.querySelector('.productcard__added'),
-                    productId = card.dataset.id;
-                    // console.log(productId); // Проверка
-    
-                addBtn.addEventListener('click', () => {
-                    if (checkProduct(productId)) {
-                        quantityIncrease(productId);
-                    } else {
-                        const cardClone = card.cloneNode(true),
-                            removeBtn = cardClone.querySelector('.productcard__btn-buy'),
-                            addedImgClone = cardClone.querySelector('.productcard__added');
-                        if (addedImgClone) addedImgClone.remove(); // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке
-                        removeBtn.textContent = 'Удалить';
-                        removeBtn.addEventListener('click', () => {
-                            cardClone.remove();
-                            refreshAll();
-                        });
-                        // Добавляем количество товара
-                        const productQuantity = document.createElement('input'),
-                            detailsWrapper = cardClone.querySelector('.productcard__details');
-                        productQuantity.setAttribute('type', 'number');
-                        productQuantity.setAttribute('min', 1);
-                        productQuantity.classList.add('productcard__quantity');
-                        productQuantity.addEventListener('change', refreshAll);
-                        detailsWrapper.appendChild(productQuantity);
-                        
-                        //Создаём селекты
-                        const productSelect = document.createElement('input');
-                        productSelect.setAttribute('type', 'checkbox');
-                        productSelect.classList.add('productcard__to-clean');
-                        cardClone.appendChild(productSelect);
-    
-                        cardClone.querySelector('.productcard__quantity').value = 1;
-                        cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
-                        refreshAll();
-                    }
-    
-                    addedImg.classList.remove('is-hidden');
-                    setTimeout(() => addedImg.classList.add('is-hidden'), 500);
-                    
-                });
-            });
         }
         
         function toggleCart() {
@@ -410,7 +404,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         toggleCart();
         toggleCheckbox();
-        toggleAddCart();
         sliceTitle();
         toggleSettings();
         toggleCategory();

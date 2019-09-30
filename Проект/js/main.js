@@ -47,12 +47,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function createElement(arr) {
         const goodsWrapper = document.querySelector('.goods');
+        let goodsArr = {};
+        let cartArr = {};
         arr.forEach(function(item) {
             let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
             product.create();
             product.checkSale();
             goodsWrapper.appendChild(product.card);
+            goodsArr[item.id] = product;
         });
+        console.log(goodsArr);
     }
 
     loadContent('db/db.json', () =>{ //? Почему работает только с запуском сервера, а в ином случае ругается?

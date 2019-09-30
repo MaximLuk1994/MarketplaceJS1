@@ -138,7 +138,7 @@ hr {
     color: black;
 }
 
-.productcard__btn-buy {
+.productcard__btn-buy, .productcard__btn-remove {
     border: 1px solid balck;
     background-color: #f1efef;
 }
