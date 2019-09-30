@@ -9,28 +9,49 @@ window.addEventListener('DOMContentLoaded', () => {
         callback();
     }
 
-    function createElement(arr) {
-        const goodsWrapper = document.querySelector('.goods');
-        arr.forEach(function(item) {
-            let card = document.createElement('div');
-            card.classList.add('productcard');
-            card.setAttribute("data-id", item.id);
-            card.setAttribute("data-sale", item.sale);
-            card.innerHTML = `
+    class ProductCard {
+        constructor(id, sale, img, price, category, title) {
+            this.id = id;
+            this.sale = sale;
+            this.img = img;
+            this.price = price;
+            this.category = category;
+            this.title = title;
+            this.template = `
                 <div class="productcard__img">
-                    <img src="${item.img}" alt="image">
+                    <img src="${img}" alt="image">
                     <div class="productcard__added is-hidden">Добавлено!</div>
                 </div>
                 <div class="productcard__sale is-hidden">sale!</div>                                                
                 <div class="productcard__details">
-                    <div class="productcard__price">${item.price}</div>
-                    <div class="productcard__category">${item.category}</div>
-                    <div class="productcard__title">${item.title}</div>
+                    <div class="productcard__price">${price}</div>
+                    <div class="productcard__category">${category}</div>
+                    <div class="productcard__title">${title}</div>
                 </div>                         
                 <button class="productcard__btn-buy btn">Купить</button>
             `;
-            goodsWrapper.appendChild(card);
-            if (item.sale) card.querySelector('.productcard__sale').classList.remove('is-hidden');
+        }
+        create() {
+            let card = document.createElement('div');
+            card.classList.add('productcard');
+            card.setAttribute("data-id", this.id);
+            card.setAttribute("data-sale", this.sale);
+            card.innerHTML = this.template;
+            this.card = card;
+        }
+        checkSale() {
+            if (this.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+        }
+
+    }
+
+    function createElement(arr) {
+        const goodsWrapper = document.querySelector('.goods');
+        arr.forEach(function(item) {
+            let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
+            product.create();
+            product.checkSale();
+            goodsWrapper.appendChild(product.card);
         });
     }
 
