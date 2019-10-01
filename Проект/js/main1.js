@@ -148,6 +148,56 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // let cart = {};
 
+    // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
+    let goodsContainer = {
+        page: {},
+        goods: [],
+        pagination: {},
+        setGoods(container) {
+            this.goods = document.querySelector(container).querySelectorAll('.productcard');
+        },
+        createPages(quantity, container) {
+            this.page.template = document.createElement('div');
+            this.page.template.classList.add('goods__page');
+            for (let i = 1; i <= quantity; i++) {
+                const page = this.page.template.cloneNode(true);
+                page.setAttribute('data-page', i);
+                document.querySelector(container).appendChild(page);
+            }
+        },
+        countPages(container) {
+            this.perPage = 10; // Количество товаров на странице, будем вытягивать из вёрстки
+            if (this.goods.length > this.perPage) {
+                const count = Math.ceil(this.goods.length / this.perPage);
+                this.pagination.template = document.createElement('nav');
+                this.pagination.template.classList.add('my-pages');
+
+                document.querySelector(container).appendChild(this.pagination.template);
+                this.pagination.template.innerHTML = `<ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>`
+
+                // console.log(count);
+                for (let i = 1; i <= count; i++) {
+                    const insertOne = document.createElement('li');
+                    insertOne.classList.add('page-item');
+                    insertOne.innerHTML = `<a class="page-link" href="${i}">${i}</a>`;
+                    this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
+                }
+            }
+        }
+    };
+
+
 
  
     const loadContent = async (url, callback) => {
@@ -160,16 +210,20 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function createElement(arr) {
-        const goodsWrapper = document.querySelector('.goods');
+        // const goodsWrapper = document.querySelector('.goods');
+        goodsContainer.createPages(1, '.goods');
+        const page = document.querySelector('.goods__page');
         let goodsArr = {};
         let cartArr = {};
         arr.forEach(function(item) {
             let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
             product.create();
             product.checkSale();
-            goodsWrapper.appendChild(product.card);
+            page.appendChild(product.card);
             goodsArr[item.id] = product;
         });
+        goodsContainer.setGoods('.goods__page');
+        goodsContainer.countPages('.content-right');
         console.log(goodsArr);
     }
 

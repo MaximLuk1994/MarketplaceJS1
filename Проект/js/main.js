@@ -1,22 +1,8 @@
 window.addEventListener('DOMContentLoaded', () => {
 
-    const loadContent = async (url, callback) => {
-        await fetch(url)
-            .then(response => response.json())
-            .then(json => createElement(json.goods))
-            .then(console.log('База загружена'));// Для себя, для проверки
-
-        callback();
-    }
-
     class ProductCard {
         constructor(id, sale, img, price, category, title) {
-            this.id = id;
-            this.sale = sale;
-            this.img = img;
-            this.price = price;
-            this.category = category;
-            this.title = title;
+            this.params = {id, sale, img, price, category, title};
             this.template = `
                 <div class="productcard__img">
                     <img src="${img}" alt="image">
@@ -30,19 +16,147 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>                         
                 <button class="productcard__btn-buy btn">Купить</button>
             `;
+            this.elems = {};
+            this.elems.card = {};
+            this.elems.shortcard = {};
+            this.cartInfo = {inCart: 0}; // Сюда потом могу вытягивать инфу из куков
         }
         create() {
             let card = document.createElement('div');
             card.classList.add('productcard');
-            card.setAttribute("data-id", this.id);
-            card.setAttribute("data-sale", this.sale);
+            card.setAttribute("data-id", this.params.id);
+            card.setAttribute("data-sale", this.params.sale);
             card.innerHTML = this.template;
             this.card = card;
+
+            this.elems.card.addBtn = this.card.querySelector('.productcard__btn-buy');
+            this.elems.card.addBtn.addEventListener('click', () => {
+                addToCart(this);
+            });
         }
         checkSale() {
-            if (this.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+        }
+    }
+
+    // Функция добавляет в объект товара вёрстку карточки для корзины и пересчитывает счётчики
+    function addToCart(elem) {
+        // console.log(elem); // Проверка
+        const addedImg = elem.card.querySelector('.productcard__added');
+        if (elem.cartInfo.inCart > 0) {
+            elem.cartInfo.inCart++;
+            elem.shortcard.querySelector('.productcard__quantity').value = elem.cartInfo.inCart;
+            refreshAll();
+        } else {
+            // Меняем вёрстку карточки
+            elem.shortcard = elem.card.cloneNode(true);
+            const removeBtn = elem.shortcard.querySelector('.productcard__btn-buy'),
+                addedImgClone = elem.shortcard.querySelector('.productcard__added');
+            if (addedImgClone) addedImgClone.remove(); // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке
+            removeBtn.textContent = 'Удалить';
+            removeBtn.classList.remove('productcard__btn-buy');
+            removeBtn.classList.add('productcard__btn-remove');
+            removeBtn.addEventListener('click', () => {
+                elem.shortcard.remove();
+                elem.cartInfo.inCart = 0;
+                // console.log(elem.cartInfo.inCart);
+                refreshAll();
+            });
+            // Добавляем количество товара
+            elem.cartInfo.inCart += 1;
+            const productQuantity = document.createElement('input'),
+                detailsWrapper = elem.shortcard.querySelector('.productcard__details');
+            productQuantity.setAttribute('type', 'number');
+            productQuantity.setAttribute('min', 1);
+            productQuantity.value = elem.cartInfo.inCart;
+            productQuantity.classList.add('productcard__quantity');
+            productQuantity.addEventListener('change', () => {
+                elem.cartInfo.inCart = productQuantity.value;
+                // console.log(elem.cartInfo.inCart);
+                refreshAll();
+            });
+            detailsWrapper.appendChild(productQuantity);
+            
+            //Создаём селекты
+            const productSelect = document.createElement('input');
+            productSelect.setAttribute('type', 'checkbox');
+            productSelect.classList.add('productcard__to-clean');
+            elem.shortcard.appendChild(productSelect);
+
+            cartWrapper.appendChild(elem.shortcard); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
+            refreshAll();
         }
 
+        // console.log(elem.cartInfo.inCart);
+        addedImg.classList.remove('is-hidden');
+        setTimeout(() => addedImg.classList.add('is-hidden'), 500);
+    }
+
+    //* 1. Обновление счётчика количества товаров в корзине, общей стоимости и надписи "Корзина пуста"
+    function refreshAll() {
+
+        const cartWrapper = document.querySelector('.cart__wrapper'),
+            cartGoods = cartWrapper.querySelectorAll('.productcard'),
+            cartQuantity = document.querySelector('#quantity'),
+            cart = document.querySelector('.cart');
+        // 1.1. Количество товаров в корзине:
+        function countCart() {
+            let counter = 0;
+            cartGoods.forEach(card => {
+                const quantity = card.querySelector('.productcard__quantity');
+                counter+= +quantity.value;
+            });
+            cartQuantity.textContent = counter;
+            if (counter == 0) {
+                cartQuantity.classList.add('is-hidden');
+            } else {
+                cartQuantity.classList.remove('is-hidden');
+            }
+        }
+
+        // 1.2. Общая стоимость в корзине:
+        function countTotal() {
+            const cartTotal = cart.querySelector('.cart__total :first-child span');
+            let total = 0;
+            cartGoods.forEach(card => {
+                const price = card.querySelector('.productcard__price');
+                const quantity = card.querySelector('.productcard__quantity');
+                total += +price.textContent * quantity.value;
+            });
+            cartTotal.textContent = total;
+        }
+
+        // 1.3. Надпись "Корзина пуста"
+        function refreshEmpty() {
+            const cartSelect = cart.querySelector('.cart__select'),
+                cleanBtn = document.getElementById('cleanBtn'),
+                carEmpty = cart.querySelector('.empty');
+            if (cartGoods.length > 0) {
+                carEmpty.classList.add('is-hidden');
+                cleanBtn.classList.remove('is-hidden');
+                cartSelect.classList.remove('is-hidden');
+            } else {
+                carEmpty.classList.remove('is-hidden');
+                cleanBtn.classList.add('is-hidden');
+                cartSelect.classList.add('is-hidden');
+            }
+        }
+        countCart();
+        refreshEmpty();
+        countTotal();        
+    }
+
+    // let cart = {};
+
+
+ 
+    const loadContent = async (url, callback) => {
+        await fetch(url)
+            .then(response => response.json())
+            .then(json => createElement(json.goods))
+            .then(console.log('База загружена'));// Для себя, для проверки
+
+        callback();
     }
 
     function createElement(arr) {
@@ -59,85 +173,11 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log(goodsArr);
     }
 
-    loadContent('db/db.json', () =>{ //? Почему работает только с запуском сервера, а в ином случае ругается?
-
-        // Когда объявляю тут эту переменную, при каждом нажатии на кнопку другого товара обнуляются изменения в записанном элементе, заданные нажатием кнопки предыдущего
-        // const productQuantity = document.createElement('div');
-        // productQuantity.classList.add('productcard__quantity');
+    loadContent('db/db.json', () =>{ 
 
         //* Общие элементы, которые будут удаляться и возвращаться:
-        const cartEmpty = document.querySelector('.empty');
+        // cartEmpty = document.querySelector('.empty');
         // Сюда же можно добавить все счётчики, чтобы они не были скрытыми элементами в вёрстке
-
-
-        //* 1. Обновление счётчика количества товаров в корзине, общей стоимости и надписи "Корзина пуста"
-        function refreshAll() {
-
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                cartGoods = cartWrapper.querySelectorAll('.productcard'),
-                cartQuantity = document.querySelector('#quantity'),
-                cart = document.querySelector('.cart');
-            // 1.1. Количество товаров в корзине:
-            function countCart() {
-                let counter = 0;
-                cartGoods.forEach(card => {
-                    const quantity = card.querySelector('.productcard__quantity');
-                    counter+= +quantity.value;
-                });
-                cartQuantity.textContent = counter;
-            }
-
-            // 1.2. Общая стоимость в корзине:
-            function countTotal() {
-                const cartTotal = cart.querySelector('.cart__total :first-child span');
-                let total = 0;
-                cartGoods.forEach(card => {
-                    const price = card.querySelector('.productcard__price');
-                    const quantity = card.querySelector('.productcard__quantity');
-                    total += +price.textContent * quantity.value;
-                });
-                cartTotal.textContent = total;
-            }
-
-            // 1.3. Надпись "Корзина пуста"
-            function refreshEmpty() {
-                const cartSelect = cart.querySelector('.cart__select'),
-                    cleanBtn = document.getElementById('cleanBtn');
-                if (cartGoods.length > 0) {
-                    if (cart.querySelector('.empty')) {
-                        cart.querySelector('.empty').remove();
-                    }            
-                    cartQuantity.classList.remove('is-hidden');
-                    cleanBtn.classList.remove('is-hidden');
-                    cartSelect.classList.remove('is-hidden');
-                } else if (!cart.querySelector('.empty')) {
-                    cartWrapper.appendChild(cartEmpty);
-                    cartQuantity.classList.add('is-hidden');
-                    cleanBtn.classList.add('is-hidden');
-                    cartSelect.classList.add('is-hidden');
-                }
-            }
-            countCart();
-            refreshEmpty();
-            countTotal();        
-        }
-
-        //* Проверка, есть ли товар с таким ID
-        function checkProduct(id) {
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`);
-            return Boolean(checkedProduct);
-        }
-
-        //* Увеличение счётчика товара в корзине на 1 по
-        function quantityIncrease(id) {
-            const cartWrapper = document.querySelector('.cart__wrapper'),
-                checkedProduct = cartWrapper.querySelector(`[data-id='${id}']`),
-                quantity = checkedProduct.querySelector('.productcard__quantity');   
-            quantity.value++;       
-            // console.log(quantity.innerText);
-            refreshAll();  
-        }
 
         function toggleSettings() {
             // const searchBtn = document.getElementById('search');
@@ -145,56 +185,6 @@ window.addEventListener('DOMContentLoaded', () => {
             //     event.preventDefault();
             //     return false; //? Нужно ли это?
             // });
-        }
-
-        function toggleAddCart() {
-            const goodsWrapper = document.querySelector('.goods'),
-                goods = goodsWrapper.querySelectorAll('.productcard'),
-                cartWrapper = document.querySelector('.cart__wrapper');
-            goods.forEach(card => {
-                const addBtn = card.querySelector('.productcard__btn-buy'),
-                    addedImg = card.querySelector('.productcard__added'),
-                    productId = card.dataset.id;
-                    // console.log(productId); // Проверка
-    
-                addBtn.addEventListener('click', () => {
-                    if (checkProduct(productId)) {
-                        quantityIncrease(productId);
-                    } else {
-                        const cardClone = card.cloneNode(true),
-                            removeBtn = cardClone.querySelector('.productcard__btn-buy'),
-                            addedImgClone = cardClone.querySelector('.productcard__added');
-                        if (addedImgClone) addedImgClone.remove(); // Удаление картинки "Добавлено", если на кнопку "Купить" нажимали слишком быстро и она осталась в вёрстке
-                        removeBtn.textContent = 'Удалить';
-                        removeBtn.addEventListener('click', () => {
-                            cardClone.remove();
-                            refreshAll();
-                        });
-                        // Добавляем количество товара
-                        const productQuantity = document.createElement('input'),
-                            detailsWrapper = cardClone.querySelector('.productcard__details');
-                        productQuantity.setAttribute('type', 'number');
-                        productQuantity.setAttribute('min', 1);
-                        productQuantity.classList.add('productcard__quantity');
-                        productQuantity.addEventListener('change', refreshAll);
-                        detailsWrapper.appendChild(productQuantity);
-                        
-                        //Создаём селекты
-                        const productSelect = document.createElement('input');
-                        productSelect.setAttribute('type', 'checkbox');
-                        productSelect.classList.add('productcard__to-clean');
-                        cardClone.appendChild(productSelect);
-    
-                        cardClone.querySelector('.productcard__quantity').value = 1;
-                        cartWrapper.appendChild(cardClone); //? Как правильно записать async-await так, чтобы последующий код выполнился именно после добавления нового элемента?
-                        refreshAll();
-                    }
-    
-                    addedImg.classList.remove('is-hidden');
-                    setTimeout(() => addedImg.classList.add('is-hidden'), 500);
-                    
-                });
-            });
         }
         
         function toggleCart() {
@@ -315,6 +305,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 toFilter.forEach(el => {
                     const isSale = el.getAttribute("data-sale");
                     if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
+                        // console.log(el)
                         if (isSale=='false') {
                             el.remove();
                         }        
@@ -371,41 +362,20 @@ window.addEventListener('DOMContentLoaded', () => {
                 checkCategory(goodsWrapper.querySelectorAll('.productcard'));
             }
 
-            discountCheckbox.addEventListener('change', () => {                
-                // checkDiscount(goods);
-                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+            discountCheckbox.addEventListener('change', () => {
                 checkAll();
             });
         
-            function filterPrice() {
-                // checkDiscount(goods);
-                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
-                checkAll();
-            }
+            min.addEventListener('change', checkAll);
+            max.addEventListener('change', checkAll);
         
-            min.addEventListener('change', filterPrice);
-            max.addEventListener('change', filterPrice);
-        
-            // Лучше бы это была форма и привязывали бы к сабмиту
             searchBtn.parentElement.addEventListener('submit', (e) => {
                 event.preventDefault();
-                // checkDiscount(goods);
-                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
                 checkAll();
                 // return false; // Надо ли? - НЕТ
             });
 
             catSelect.addEventListener('change', () => {
-                // checkDiscount(goods);
-                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
                 checkAll();
             });
 
@@ -414,7 +384,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         toggleCart();
         toggleCheckbox();
-        toggleAddCart();
         sliceTitle();
         toggleSettings();
         toggleCategory();

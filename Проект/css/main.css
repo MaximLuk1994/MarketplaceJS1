@@ -69,6 +69,13 @@ hr {
     flex-wrap: wrap;
 }
 
+.goods__page {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
 .productcard {
     border:1px solid #d6d6d6;
     border-radius: 10px;
@@ -449,4 +456,8 @@ input.productcard__quantity {
     left: 2px;
     content: "";
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 15 15' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.3 15L15 1.2 13.7 0 5.1 12.3 1.1 8 0 9.4 5.3 15z' fill='%23005bff'/%3E%3C/svg%3E")
+}
+
+.pagination {
+    justify-content: center;
 }
