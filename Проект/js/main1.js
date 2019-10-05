@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
         checkSale() {
-            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden'); // отдельная функция, потому что не могу обращаться к тегу "распродажи" пока карточка не создана
         }
     }
 
@@ -151,11 +151,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
     let goodsContainer = {
         page: {},
-        goods: [],
+        goodsArr: [],
+        // goodsObjs: [],
         pagination: {},
-        setGoods(container) {
-            this.goods = document.querySelector(container).querySelectorAll('.productcard');
-        },
         createPages(quantity, container) {
             this.page.template = document.createElement('div');
             this.page.template.classList.add('goods__page');
@@ -165,29 +163,66 @@ window.addEventListener('DOMContentLoaded', () => {
                 document.querySelector(container).appendChild(page);
             }
         },
-        countPages(container) {
-            this.perPage = 10; // Количество товаров на странице, будем вытягивать из вёрстки
-            if (this.goods.length > this.perPage) {
-                const count = Math.ceil(this.goods.length / this.perPage);
-                this.pagination.template = document.createElement('nav');
-                this.pagination.template.classList.add('my-pages');
+        paginationTemplateIni() {
+            this.pagination.template = document.createElement('nav');
+            this.pagination.template.classList.add('my-pages');
+            this.pagination.template.innerHTML = `<ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>`
+        },
+        countPages(perPage) {
+            this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
+            this.page.count = Math.ceil(this.goodsArr.length / this.page.perPage);
+        },
+        spreadPages(arr, container) {
+            for (let i = 1; i <=goodsContainer.page.count; i++) {
+                const pagesWrapper = document.querySelector(container);
+                const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
+                for (let j = goodsContainer.page.perPage*(i-1)+1; j <= goodsContainer.page.perPage*i && j <= arr.length; j++) {
+                    let product = new ProductCard(arr[j-1].id, arr[j-1].sale, arr[j-1].img, arr[j-1].price, arr[j-1].category, arr[j-1].title);
+                    product.create();
+                    product.checkSale();
+                    page.appendChild(product.card);
+                    // this.goodsObjs.push(product);
+                }
+    
+            }
+            // console.log(this.goodsObjs);
+        },
+        checkFilters(container) {
+            const goodsWrapper = document.querySelector(container),
+                // goods = goodsWrapper.querySelectorAll('.productcard'),
+                discountCheckbox = document.querySelector('#discount-checkbox'),
+                min = document.getElementById('min'),
+                max = document.getElementById('max'),
+                searchBtn = document.querySelector('#search'),
+                searchInput = searchBtn.previousElementSibling,
+                catSelect = document.querySelector('.filter-category_select');
 
-                document.querySelector(container).appendChild(this.pagination.template);
-                this.pagination.template.innerHTML = `<ul class="pagination">
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>`
+            let toSort = this.goodsArr,
+                toShow = [];
+
+            goodsWrapper.innerHTML = ""; // Очистили от списка товаров (включая страницы и кнопки)
+            toSort.forEach((el, i) => {
+            });
+
+
+        },
+        pageNumbers(container) {
+            if (this.page.count > 1) {                
+                document.querySelector(container).appendChild(this.pagination.template);                
 
                 // console.log(count);
-                for (let i = 1; i <= count; i++) {
+                for (let i = 1; i <= this.page.count; i++) {
                     const insertOne = document.createElement('li');
                     insertOne.classList.add('page-item');
                     insertOne.innerHTML = `<a class="page-link" href="${i}">${i}</a>`;
@@ -210,21 +245,13 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function createElement(arr) {
+        goodsContainer.goodsArr = arr;
+        goodsContainer.paginationTemplateIni();
+        goodsContainer.countPages(5);
         // const goodsWrapper = document.querySelector('.goods');
-        goodsContainer.createPages(1, '.goods');
-        const page = document.querySelector('.goods__page');
-        let goodsArr = {};
-        let cartArr = {};
-        arr.forEach(function(item) {
-            let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
-            product.create();
-            product.checkSale();
-            page.appendChild(product.card);
-            goodsArr[item.id] = product;
-        });
-        goodsContainer.setGoods('.goods__page');
-        goodsContainer.countPages('.content-right');
-        console.log(goodsArr);
+        goodsContainer.createPages(goodsContainer.page.count, '.goods');
+        goodsContainer.spreadPages(arr,'.goods');
+        goodsContainer.pageNumbers('.content-right');
     }
 
     loadContent('db/db.json', () =>{ 
@@ -353,33 +380,40 @@ window.addEventListener('DOMContentLoaded', () => {
                 searchBtn = document.querySelector('#search'),
                 searchInput = searchBtn.previousElementSibling,
                 catSelect = document.querySelector('.filter-category_select');
+
+            let toSort = [],
+                toShow = [];
         
             function checkDiscount(toFilter) {
                 // const goods = document.querySelectorAll('.productcard');
-                toFilter.forEach(el => {
+                toFilter.forEach((el, i) => {
                     const isSale = el.getAttribute("data-sale");
                     if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
                         // console.log(el)
                         if (isSale=='false') {
-                            el.remove();
+                            // el.remove();
+                            toFilter.splice(i, 1);
                         }        
-                    } else {
-                        goodsWrapper.appendChild(el);
+                    // else {
+                    //     goodsWrapper.appendChild(el);
+                    // }
                     }
                 });
             }
 
             function checkPrice(toFilter) {
                 // const goods = document.querySelectorAll('.productcard');
-                toFilter.forEach((el) => {
+                toFilter.forEach((el, i) => {
                     const cardPrice = el.querySelector('.productcard__price');
                     const price = parseFloat(cardPrice.textContent);
                     // console.log(price);
                     if ((min.value && price <= min.value) || (max.value && price >= max.value)) {
-                        el.remove();
-                    } else {
-                        goodsWrapper.appendChild(el);
-                    }
+                        // el.remove();
+                        toFilter.splice(i, 1);
+                    } 
+                    // else {
+                    //     goodsWrapper.appendChild(el);
+                    // }
                 });
             }
 
@@ -388,32 +422,38 @@ window.addEventListener('DOMContentLoaded', () => {
                 // const goods = document.querySelectorAll('.productcard');
                 // метод trim() убирает лишние пробелы по бокам
                 // console.log(searchText);
-                toFilter.forEach((el) => {
+                toFilter.forEach((el, i) => {
                     const title = el.querySelector('.productcard__title');
                     if (!searchText.test(title.textContent)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
-                        el.remove();
-                    } else {
-                        goodsWrapper.appendChild(el);
-                    }
+                        // el.remove();
+                        toFilter.splice(i, 1);
+                    } 
+                    // else {
+                    //     goodsWrapper.appendChild(el);
+                    // }
                 });
             }
 
             function checkCategory(toFilter) {
-                toFilter.forEach(el =>{
+                toFilter.forEach((el, i) =>{
                     const cardCategory = el.querySelector('.productcard__category');
                     if (cardCategory.innerText !== catSelect.value && catSelect.value !== "all") {
-                        el.remove();
-                    } else {
-                        goodsWrapper.appendChild(el);
-                    }
+                        // el.remove();
+                        toFilter.splice(i, 1);
+                    } 
+                    // else {
+                    //     goodsWrapper.appendChild(el);
+                    // }
                 });
             }
 
             function checkAll() {
-                checkDiscount(goods);
-                checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                toSort = goodsContainer.goodsObjs;
+                // console.log(toSort);
+                checkDiscount(toSort);
+                checkPrice(toSort);
+                checkSearch(toSort);
+                checkCategory(toSort);
             }
 
             discountCheckbox.addEventListener('change', () => {

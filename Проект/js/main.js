@@ -35,7 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
         checkSale() {
-            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden');
+            if (this.params.sale) this.card.querySelector('.productcard__sale').classList.remove('is-hidden'); // отдельная функция, потому что не могу обращаться к тегу "распродажи" пока карточка не создана
         }
     }
 
@@ -148,6 +148,72 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // let cart = {};
 
+    // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
+    let goodsContainer = {
+        page: {},
+        goods: [],
+        pagination: {},        
+        setGoods(container) {
+            this.goods = document.querySelector(container).querySelectorAll('.productcard');
+        },
+        createPages(quantity, container) {
+            this.page.template = document.createElement('div');
+            this.page.template.classList.add('goods__page');
+            for (let i = 1; i <= quantity; i++) {
+                const page = this.page.template.cloneNode(true);
+                page.setAttribute('data-page', i);
+                document.querySelector(container).appendChild(page);
+            }
+        },
+        paginationTemplateIni() {
+            this.pagination.template = document.createElement('nav');
+            this.pagination.template.classList.add('my-pages');
+            this.pagination.template.innerHTML = `<ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>`
+        },
+        countPages(perPage) {
+            this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
+            this.page.count = Math.ceil(this.goods.length / this.page.perPage);
+        },
+        spreadPages(arr, container) {
+            for (let i = 1; i <=goodsContainer.page.count; i++) {
+                const pagesWrapper = document.querySelector(container);
+                const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
+                for (let j = goodsContainer.page.perPage*(i-1)+1; j <= goodsContainer.page.perPage*i && j <= arr.length; j++) {
+                    let product = new ProductCard(arr[j-1].id, arr[j-1].sale, arr[j-1].img, arr[j-1].price, arr[j-1].category, arr[j-1].title);
+                    product.create();
+                    product.checkSale();
+                    page.appendChild(product.card);
+                }
+    
+            }
+        },
+        pageNumbers(container) {
+            if (this.page.count > 1) {                
+                document.querySelector(container).appendChild(this.pagination.template);                
+
+                // console.log(count);
+                for (let i = 1; i <= this.page.count; i++) {
+                    const insertOne = document.createElement('li');
+                    insertOne.classList.add('page-item');
+                    insertOne.innerHTML = `<a class="page-link" href="${i}">${i}</a>`;
+                    this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
+                }
+            }
+        }
+    };
+
+
 
  
     const loadContent = async (url, callback) => {
@@ -160,17 +226,13 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function createElement(arr) {
-        const goodsWrapper = document.querySelector('.goods');
-        let goodsArr = {};
-        let cartArr = {};
-        arr.forEach(function(item) {
-            let product = new ProductCard(item.id, item.sale, item.img, item.price, item.category, item.title);
-            product.create();
-            product.checkSale();
-            goodsWrapper.appendChild(product.card);
-            goodsArr[item.id] = product;
-        });
-        console.log(goodsArr);
+        goodsContainer.goods = arr;
+        goodsContainer.paginationTemplateIni();
+        goodsContainer.countPages(5);
+        // const goodsWrapper = document.querySelector('.goods');
+        goodsContainer.createPages(goodsContainer.page.count, '.goods');
+        goodsContainer.spreadPages(arr,'.goods');
+        goodsContainer.pageNumbers('.content-right');
     }
 
     loadContent('db/db.json', () =>{ 
