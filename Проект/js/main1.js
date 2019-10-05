@@ -152,6 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let goodsContainer = {
         page: {},
         goodsArr: [],
+        goodsShow: [],
         // goodsObjs: [],
         pagination: {},
         createPages(quantity, container) {
@@ -179,9 +180,9 @@ window.addEventListener('DOMContentLoaded', () => {
                     </li>
                 </ul>`
         },
-        countPages(perPage) {
+        countPages(perPage, arr) {
             this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
-            this.page.count = Math.ceil(this.goodsArr.length / this.page.perPage);
+            this.page.count = Math.ceil(arr.length / this.page.perPage);
         },
         spreadPages(arr, container) {
             for (let i = 1; i <=goodsContainer.page.count; i++) {
@@ -200,7 +201,6 @@ window.addEventListener('DOMContentLoaded', () => {
         },
         checkFilters(container) {
             const goodsWrapper = document.querySelector(container),
-                // goods = goodsWrapper.querySelectorAll('.productcard'),
                 discountCheckbox = document.querySelector('#discount-checkbox'),
                 min = document.getElementById('min'),
                 max = document.getElementById('max'),
@@ -211,18 +211,66 @@ window.addEventListener('DOMContentLoaded', () => {
             let toSort = this.goodsArr,
                 toShow = [];
 
+            function checkDiscount(el) {
+                if (discountCheckbox.checked){
+                    if (el.sale) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+
+            function checkPrice(el) {
+                if ((min.value && el.price < min.value) || (max.value && el.price > max.value)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function checkSearch(el) {
+                const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
+                if (!searchText.test(el.title)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
+                    return false;
+                } else {
+                    return true;
+                }
+        }
+
+            function checkCategory(el) {
+                if (el.category !== catSelect.value && catSelect.value !== "all") {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function checkAll(el) {
+                return (checkDiscount(el) && checkPrice(el) && checkSearch(el) && checkCategory(el));
+            }
+
             goodsWrapper.innerHTML = ""; // Очистили от списка товаров (включая страницы и кнопки)
-            toSort.forEach((el, i) => {
+            toSort.forEach(function(el) {
+                if (checkAll(el)) {
+                    toShow.push(el);
+                }
             });
-
-
+            this.goodsShow = toShow;
         },
-        pageNumbers(container) {
+        pageNumbers(count, container) {
+            if (document.querySelector('nav.my-pages')) document.querySelector('nav.my-pages').remove(); //! Сделать отдельный блок для номеров
+            const allNumbers = this.pagination.template.querySelectorAll('li');
+            allNumbers.forEach((el, i) => {
+                if (i > 0 && i < allNumbers.length-1) el.remove();
+            });
             if (this.page.count > 1) {                
                 document.querySelector(container).appendChild(this.pagination.template);                
 
                 // console.log(count);
-                for (let i = 1; i <= this.page.count; i++) {
+                for (let i = 1; i <= count; i++) {
                     const insertOne = document.createElement('li');
                     insertOne.classList.add('page-item');
                     insertOne.innerHTML = `<a class="page-link" href="${i}">${i}</a>`;
@@ -247,11 +295,12 @@ window.addEventListener('DOMContentLoaded', () => {
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
         goodsContainer.paginationTemplateIni();
-        goodsContainer.countPages(5);
+        goodsContainer.checkFilters('.goods');
+        goodsContainer.countPages(5, goodsContainer.goodsShow);
         // const goodsWrapper = document.querySelector('.goods');
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
-        goodsContainer.spreadPages(arr,'.goods');
-        goodsContainer.pageNumbers('.content-right');
+        goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
+        goodsContainer.pageNumbers(goodsContainer.page.count,'.content-right');
     }
 
     loadContent('db/db.json', () =>{ 
@@ -380,80 +429,76 @@ window.addEventListener('DOMContentLoaded', () => {
                 searchBtn = document.querySelector('#search'),
                 searchInput = searchBtn.previousElementSibling,
                 catSelect = document.querySelector('.filter-category_select');
-
-            let toSort = [],
-                toShow = [];
         
-            function checkDiscount(toFilter) {
-                // const goods = document.querySelectorAll('.productcard');
-                toFilter.forEach((el, i) => {
-                    const isSale = el.getAttribute("data-sale");
-                    if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
-                        // console.log(el)
-                        if (isSale=='false') {
-                            // el.remove();
-                            toFilter.splice(i, 1);
-                        }        
-                    // else {
-                    //     goodsWrapper.appendChild(el);
-                    // }
-                    }
-                });
-            }
+            // function checkDiscount(toFilter) {
+            //     // const goods = document.querySelectorAll('.productcard');
+            //     toFilter.forEach((el, i) => {
+            //         const isSale = el.getAttribute("data-sale");
+            //         if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
+            //             // console.log(el)
+            //             if (isSale=='false') {
+            //                 el.remove();
+            //                 // toFilter.splice(i, 1);
+            //             } else {
+            //             goodsWrapper.appendChild(el);
+            //         }
+            //         }
+            //     });
+            // }
 
-            function checkPrice(toFilter) {
-                // const goods = document.querySelectorAll('.productcard');
-                toFilter.forEach((el, i) => {
-                    const cardPrice = el.querySelector('.productcard__price');
-                    const price = parseFloat(cardPrice.textContent);
-                    // console.log(price);
-                    if ((min.value && price <= min.value) || (max.value && price >= max.value)) {
-                        // el.remove();
-                        toFilter.splice(i, 1);
-                    } 
-                    // else {
-                    //     goodsWrapper.appendChild(el);
-                    // }
-                });
-            }
+            // function checkPrice(toFilter) {
+            //     // const goods = document.querySelectorAll('.productcard');
+            //     toFilter.forEach((el, i) => {
+            //         const cardPrice = el.querySelector('.productcard__price');
+            //         const price = parseFloat(cardPrice.textContent);
+            //         // console.log(price);
+            //         if ((min.value && price <= min.value) || (max.value && price >= max.value)) {
+            //             el.remove();
+            //             // toFilter.splice(i, 1);
+            //         } else {
+            //             goodsWrapper.appendChild(el);
+            //         }
+            //     });
+            // }
 
-            function checkSearch(toFilter) {
-                const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
-                // const goods = document.querySelectorAll('.productcard');
-                // метод trim() убирает лишние пробелы по бокам
-                // console.log(searchText);
-                toFilter.forEach((el, i) => {
-                    const title = el.querySelector('.productcard__title');
-                    if (!searchText.test(title.textContent)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
-                        // el.remove();
-                        toFilter.splice(i, 1);
-                    } 
-                    // else {
-                    //     goodsWrapper.appendChild(el);
-                    // }
-                });
-            }
+            // function checkSearch(toFilter) {
+            //     const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
+            //     // const goods = document.querySelectorAll('.productcard');
+            //     // метод trim() убирает лишние пробелы по бокам
+            //     // console.log(searchText);
+            //     toFilter.forEach((el, i) => {
+            //         const title = el.querySelector('.productcard__title');
+            //         if (!searchText.test(title.textContent)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
+            //             el.remove();
+            //             // toFilter.splice(i, 1);
+            //         } else {
+            //             goodsWrapper.appendChild(el);
+            //         }
+            //     });
+            // }
 
-            function checkCategory(toFilter) {
-                toFilter.forEach((el, i) =>{
-                    const cardCategory = el.querySelector('.productcard__category');
-                    if (cardCategory.innerText !== catSelect.value && catSelect.value !== "all") {
-                        // el.remove();
-                        toFilter.splice(i, 1);
-                    } 
-                    // else {
-                    //     goodsWrapper.appendChild(el);
-                    // }
-                });
-            }
+            // function checkCategory(toFilter) {
+            //     toFilter.forEach((el, i) =>{
+            //         const cardCategory = el.querySelector('.productcard__category');
+            //         if (cardCategory.innerText !== catSelect.value && catSelect.value !== "all") {
+            //             el.remove();
+            //             // toFilter.splice(i, 1);
+            //         } else {
+            //             goodsWrapper.appendChild(el);
+            //         }
+            //     });
+            // }
 
             function checkAll() {
-                toSort = goodsContainer.goodsObjs;
-                // console.log(toSort);
-                checkDiscount(toSort);
-                checkPrice(toSort);
-                checkSearch(toSort);
-                checkCategory(toSort);
+                // checkDiscount(goods);
+                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
+                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
+                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
+                goodsContainer.checkFilters('.goods');
+                goodsContainer.countPages(5, goodsContainer.goodsShow);
+                goodsContainer.createPages(goodsContainer.page.count, '.goods');
+                goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
+                goodsContainer.pageNumbers(goodsContainer.page.count,'.content-right');
             }
 
             discountCheckbox.addEventListener('change', () => {
