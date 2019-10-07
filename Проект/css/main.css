@@ -332,7 +332,7 @@ input.productcard__quantity {
     margin-top: 15%
 }
 
-.filter-price_title, .filter-category_title {
+.filter-price_title, .filter-category_title, .filter-perPage_title {
     display: block;
     font-size: 14px;
     line-height: 13px;

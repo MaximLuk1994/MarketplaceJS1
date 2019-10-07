@@ -151,11 +151,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
     let goodsContainer = {
         page: {},
+        perPage: 8,
         goodsArr: [],
         goodsShow: [],
         // goodsObjs: [],
         pagination: {},
         createPages(quantity, container) {
+            document.querySelector(container).innerHTML = "";
             this.page.template = document.createElement('div');
             this.page.template.classList.add('goods__page');
             for (let i = 1; i <= quantity; i++) {
@@ -261,13 +263,14 @@ window.addEventListener('DOMContentLoaded', () => {
             this.goodsShow = toShow;
         },
         pageNumbers(count, container) {
-            if (document.querySelector('nav.my-pages')) document.querySelector('nav.my-pages').remove(); //! Сделать отдельный блок для номеров
+            const pages = document.querySelector(container);
+            if (pages.querySelector('nav')) pages.querySelector('nav').remove(); //! Сделать отдельный блок для номеров
             const allNumbers = this.pagination.template.querySelectorAll('li');
             allNumbers.forEach((el, i) => {
                 if (i > 0 && i < allNumbers.length-1) el.remove();
             });
             if (this.page.count > 1) {                
-                document.querySelector(container).appendChild(this.pagination.template);                
+                pages.appendChild(this.pagination.template);                
 
                 // console.log(count);
                 for (let i = 1; i <= count; i++) {
@@ -277,6 +280,15 @@ window.addEventListener('DOMContentLoaded', () => {
                     this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
                 }
             }
+        },
+        togglePerPage() {
+            document.querySelector('.filter-perPage_select').addEventListener('change', function() {
+                goodsContainer.perPage = this.value;
+                goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
+                goodsContainer.createPages(goodsContainer.page.count, '.goods');
+                goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
+                goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+            });
         }
     };
 
@@ -296,25 +308,18 @@ window.addEventListener('DOMContentLoaded', () => {
         goodsContainer.goodsArr = arr;
         goodsContainer.paginationTemplateIni();
         goodsContainer.checkFilters('.goods');
-        goodsContainer.countPages(5, goodsContainer.goodsShow);
-        // const goodsWrapper = document.querySelector('.goods');
+        goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
         goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
-        goodsContainer.pageNumbers(goodsContainer.page.count,'.content-right');
+        goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+        goodsContainer.togglePerPage();
+        //? Стоит ли перенести эти функции в коллбэк loadContent-а?
     }
 
     loadContent('db/db.json', () =>{ 
 
-        //* Общие элементы, которые будут удаляться и возвращаться:
-        // cartEmpty = document.querySelector('.empty');
-        // Сюда же можно добавить все счётчики, чтобы они не были скрытыми элементами в вёрстке
-
         function toggleSettings() {
-            // const searchBtn = document.getElementById('search');
-            // searchBtn.parentElement.addEventListener('submit', (e) => {
-            //     event.preventDefault();
-            //     return false; //? Нужно ли это?
-            // });
+            // Всякие настройки тоже можно хранить в объекте и включать в loadContent
         }
         
         function toggleCart() {
@@ -490,15 +495,11 @@ window.addEventListener('DOMContentLoaded', () => {
             // }
 
             function checkAll() {
-                // checkDiscount(goods);
-                // checkPrice(goodsWrapper.querySelectorAll('.productcard'));
-                // checkSearch(goodsWrapper.querySelectorAll('.productcard'));
-                // checkCategory(goodsWrapper.querySelectorAll('.productcard'));
                 goodsContainer.checkFilters('.goods');
-                goodsContainer.countPages(5, goodsContainer.goodsShow);
+                goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
                 goodsContainer.createPages(goodsContainer.page.count, '.goods');
                 goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
-                goodsContainer.pageNumbers(goodsContainer.page.count,'.content-right');
+                goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
             }
 
             discountCheckbox.addEventListener('change', () => {
