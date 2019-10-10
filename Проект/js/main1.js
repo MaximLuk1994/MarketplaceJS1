@@ -215,20 +215,22 @@ window.addEventListener('DOMContentLoaded', () => {
         paginationIni() {
             this.currentPage = 0;
             this.pagesArr[this.currentPage].classList.remove('is-hidden');
-            this.paginationArr[this.currentPage].classList.add('active');
-            this.paginationArr.forEach((el, i) => {
-                el.addEventListener('click', () => {
-                    this.pagesArr[i].classList.remove('is-hidden');
-                    this.paginationArr[i].classList.add('active');
-                    this.currentPage = i;
-                    for (let page = 0; page < this.pagesArr.length; page++) {
-                        if (page != i) {
-                            this.pagesArr[page].classList.add('is-hidden');
-                            this.paginationArr[page].classList.remove('active');
+            if (this.paginationArr.length > 0) {
+                this.paginationArr[this.currentPage].classList.add('active');
+                this.paginationArr.forEach((el, i) => {
+                    el.addEventListener('click', () => {
+                        this.pagesArr[i].classList.remove('is-hidden');
+                        this.paginationArr[i].classList.add('active');
+                        this.currentPage = i;
+                        for (let page = 0; page < this.pagesArr.length; page++) {
+                            if (page != i) {
+                                this.pagesArr[page].classList.add('is-hidden');
+                                this.paginationArr[page].classList.remove('active');
+                            }
                         }
-                    }
+                    });
                 });
-            });
+            }            
         },
         paginationNextPrevIni() {
             this.pagination.template.querySelectorAll('a').forEach((el, i) => {
