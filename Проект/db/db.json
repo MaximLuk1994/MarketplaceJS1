@@ -1,6 +1,6 @@
 {
 	"goods": [{
-		"id": 1,
+		"id": "1ss",
 		"title": "Игровая приставка Sony PlayStation 4 Pro",
 		"price": 33990,
 		"sale": false,
@@ -183,5 +183,545 @@
 		"sale": true,
 		"img": "https://cdn1.ozone.ru/multimedia/c400/1023547851.jpg",
 		"category": "Игры и софт"
-	}]
+	},
+	{
+		"id": 25,
+		"title": "quis dolor consectetur proident",
+		"price": 39390,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 26,
+		"title": "sit voluptate consequat reprehenderit",
+		"price": 7615,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 27,
+		"title": "dolor anim amet nostrud",
+		"price": 42047,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 28,
+		"title": "culpa anim eu exercitation",
+		"price": 29401,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 29,
+		"title": "ullamco deserunt cillum veniam",
+		"price": 37295,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 30,
+		"title": "nulla minim exercitation nostrud",
+		"price": 39592,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 31,
+		"title": "proident ullamco adipisicing cupidatat",
+		"price": 27103,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 32,
+		"title": "labore aute non occaecat",
+		"price": 31128,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 33,
+		"title": "quis est aute duis",
+		"price": 4712,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 34,
+		"title": "officia officia ad aute",
+		"price": 13814,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 35,
+		"title": "ea et labore consectetur",
+		"price": 2030,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 36,
+		"title": "ex qui consequat cupidatat",
+		"price": 48459,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 37,
+		"title": "enim enim labore enim",
+		"price": 15592,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 38,
+		"title": "sunt in ullamco anim",
+		"price": 26723,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 39,
+		"title": "magna ex sint deserunt",
+		"price": 39415,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 40,
+		"title": "sit laborum dolor exercitation",
+		"price": 23773,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 41,
+		"title": "voluptate est commodo laboris",
+		"price": 35293,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 42,
+		"title": "anim commodo exercitation dolore",
+		"price": 21610,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 43,
+		"title": "sint elit enim non",
+		"price": 2218,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 44,
+		"title": "aliquip aute consectetur irure",
+		"price": 19517,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 45,
+		"title": "reprehenderit proident qui ipsum",
+		"price": 18881,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 46,
+		"title": "occaecat proident ut amet",
+		"price": 10214,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 47,
+		"title": "commodo ea ad exercitation",
+		"price": 39791,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 48,
+		"title": "duis pariatur culpa tempor",
+		"price": 19205,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 49,
+		"title": "enim occaecat est ad",
+		"price": 12986,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 50,
+		"title": "deserunt ex qui occaecat",
+		"price": 22282,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 51,
+		"title": "consectetur officia sit Lorem",
+		"price": 11952,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 52,
+		"title": "dolore ad elit in",
+		"price": 23530,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 53,
+		"title": "dolore est laborum exercitation",
+		"price": 22180,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 54,
+		"title": "proident proident fugiat ad",
+		"price": 9878,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 55,
+		"title": "ullamco consequat amet laboris",
+		"price": 33319,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 56,
+		"title": "excepteur id aute nisi",
+		"price": 39661,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 57,
+		"title": "elit nostrud sint deserunt",
+		"price": 12092,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 58,
+		"title": "minim do ullamco in",
+		"price": 1143,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 59,
+		"title": "sit sit laboris deserunt",
+		"price": 41732,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 60,
+		"title": "reprehenderit deserunt eu cillum",
+		"price": 32054,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 61,
+		"title": "commodo aute nostrud ut",
+		"price": 38863,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 62,
+		"title": "sunt aute ea quis",
+		"price": 34205,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 63,
+		"title": "velit cillum Lorem fugiat",
+		"price": 48381,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 64,
+		"title": "cillum aute ad deserunt",
+		"price": 34882,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 65,
+		"title": "velit occaecat nisi in",
+		"price": 36062,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 66,
+		"title": "reprehenderit sint minim esse",
+		"price": 39328,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 67,
+		"title": "non dolor ipsum irure",
+		"price": 17034,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 68,
+		"title": "sunt laborum irure exercitation",
+		"price": 38816,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 69,
+		"title": "enim incididunt incididunt ea",
+		"price": 9795,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 70,
+		"title": "fugiat enim ipsum deserunt",
+		"price": 9763,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 71,
+		"title": "aliquip proident adipisicing ipsum",
+		"price": 15303,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 72,
+		"title": "enim velit elit labore",
+		"price": 4773,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 73,
+		"title": "sit fugiat sint velit",
+		"price": 5285,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 74,
+		"title": "ex irure cillum adipisicing",
+		"price": 30586,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 75,
+		"title": "labore voluptate et tempor",
+		"price": 25348,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 76,
+		"title": "nulla incididunt qui officia",
+		"price": 34503,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 77,
+		"title": "non qui eiusmod aute",
+		"price": 18289,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игры и софт"
+	  },
+	  {
+		"id": 78,
+		"title": "pariatur dolore nisi qui",
+		"price": 48394,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 79,
+		"title": "occaecat quis anim cillum",
+		"price": 3095,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 80,
+		"title": "incididunt in est nulla",
+		"price": 47373,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 81,
+		"title": "non id est anim",
+		"price": 6389,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Игровая приставка"
+	  },
+	  {
+		"id": 82,
+		"title": "quis excepteur Lorem labore",
+		"price": 49508,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 83,
+		"title": "non officia aliquip exercitation",
+		"price": 2837,
+		"sale": false,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  },
+	  {
+		"id": 84,
+		"title": "ipsum mollit commodo aliqua",
+		"price": 15493,
+		"sale": true,
+		"img": "http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png",
+		"hoverImg": "http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png",
+		"category": "Периферия для ПК"
+	  }]
 }

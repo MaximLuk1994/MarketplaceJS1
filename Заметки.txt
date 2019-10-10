@@ -1,0 +1,14 @@
+https://www.json-generator.com/
+
+[
+  '{{repeat(60, 60)}}',
+  {
+    id: '{{25+index()}}',
+    title: '{{lorem(4, "words")}}',
+    price: '{{floating(200, 50000, 0, "00")}}',
+    sale: '{{bool()}}',
+    img: 'http://s1.iconbird.com/ico/2013/9/452/w480h5121380477037photo.png',
+    hoverImg: 'http://s1.iconbird.com/ico/2013/9/452/w512h4321380476728camera.png',
+    category: '{{random("Игры и софт", "Периферия для ПК", "Игровая приставка")}}'    
+  }
+]
