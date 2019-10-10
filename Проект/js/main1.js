@@ -152,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let goodsContainer = {
         page: {},
         perPage: 8,
-        currentPage: 1,
+        currentPage: 0,
         goodsArr: [],
         goodsShow: [],
         // goodsObjs: [],
@@ -178,12 +178,12 @@ window.addEventListener('DOMContentLoaded', () => {
             this.pagination.template.classList.add('my-pages');
             this.pagination.template.innerHTML = `<ul class="pagination">
                     <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
+                        <a class="page-link" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
+                        <a class="page-link" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -213,17 +213,37 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         },
         paginationIni() {
-            this.currentPage = 1;
-            this.pagesArr[this.currentPage-1].classList.remove('is-hidden');
+            this.currentPage = 0;
+            this.pagesArr[this.currentPage].classList.remove('is-hidden');
+            this.paginationArr[this.currentPage].classList.add('active');
             this.paginationArr.forEach((el, i) => {
                 el.addEventListener('click', () => {
                     this.pagesArr[i].classList.remove('is-hidden');
+                    this.paginationArr[i].classList.add('active');
+                    this.currentPage = i;
                     for (let page = 0; page < this.pagesArr.length; page++) {
                         if (page != i) {
                             this.pagesArr[page].classList.add('is-hidden');
+                            this.paginationArr[page].classList.remove('active');
                         }
                     }
                 });
+            });
+        },
+        paginationNextPrevIni() {
+            this.pagination.template.querySelectorAll('a').forEach((el, i) => {
+                const target = el.getAttribute("aria-label");
+                if (target == "Previous" || target == "Next") {
+                    el.parentElement.addEventListener('click', () => {
+                        this.pagesArr[this.currentPage].classList.add('is-hidden');
+                        this.paginationArr[this.currentPage].classList.remove('active');
+                        target == "Previous" ? this.currentPage-- : this.currentPage++;
+                        if (this.currentPage > this.pagesArr.length-1) this.currentPage = this.pagesArr.length-1;
+                        if (this.currentPage < 0) this.currentPage = 0;
+                        this.pagesArr[this.currentPage].classList.remove('is-hidden');
+                        this.paginationArr[this.currentPage].classList.add('active');
+                    });
+                }
             });
         },
         countPages(perPage, arr) {
@@ -341,6 +361,7 @@ window.addEventListener('DOMContentLoaded', () => {
         goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
         goodsContainer.paginationIni();
         goodsContainer.togglePerPage();
+        goodsContainer.paginationNextPrevIni();
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
     }
 
