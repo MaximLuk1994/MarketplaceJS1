@@ -152,19 +152,26 @@ window.addEventListener('DOMContentLoaded', () => {
     let goodsContainer = {
         page: {},
         perPage: 8,
+        currentPage: 1,
         goodsArr: [],
         goodsShow: [],
         // goodsObjs: [],
+        pagesArr: [],
         pagination: {},
+        paginationArr: [],
         createPages(quantity, container) {
+            this.pagesArr = [];
             document.querySelector(container).innerHTML = "";
             this.page.template = document.createElement('div');
             this.page.template.classList.add('goods__page');
             for (let i = 1; i <= quantity; i++) {
                 const page = this.page.template.cloneNode(true);
                 page.setAttribute('data-page', i);
+                page.classList.toggle('is-hidden');
                 document.querySelector(container).appendChild(page);
+                this.pagesArr.push(page);
             }
+            // console.log(this.pagesArr);
         },
         paginationTemplateIni() {
             this.pagination.template = document.createElement('nav');
@@ -181,6 +188,43 @@ window.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </li>
                 </ul>`
+        },
+        pageNumbers(count, container) {
+            this.paginationArr = [];
+            const pages = document.querySelector(container);
+            if (pages.querySelector('nav')) pages.querySelector('nav').remove();
+            const allNumbers = this.pagination.template.querySelectorAll('li');
+            // Удаляем в шаблоне все элементы пагинации, кроме первого и последнего:
+            allNumbers.forEach((el, i) => {
+                if (i > 0 && i < allNumbers.length-1) el.remove();
+            });
+            if (this.page.count > 1) {                
+                pages.appendChild(this.pagination.template);                
+
+                // console.log(count);
+                for (let i = 1; i <= count; i++) {
+                    const insertOne = document.createElement('li');
+                    insertOne.classList.add('page-item');
+                    insertOne.innerHTML = `<a class="page-link" target="${i}">${i}</a>`; // Может, без использования таргета буду назначать обработчики
+                    this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
+                    this.paginationArr.push(insertOne);
+                }
+                // console.log(this.paginationArr);
+            }
+        },
+        paginationIni() {
+            this.currentPage = 1;
+            this.pagesArr[this.currentPage-1].classList.remove('is-hidden');
+            this.paginationArr.forEach((el, i) => {
+                el.addEventListener('click', () => {
+                    this.pagesArr[i].classList.remove('is-hidden');
+                    for (let page = 0; page < this.pagesArr.length; page++) {
+                        if (page != i) {
+                            this.pagesArr[page].classList.add('is-hidden');
+                        }
+                    }
+                });
+            });
         },
         countPages(perPage, arr) {
             this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
@@ -255,31 +299,13 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             goodsWrapper.innerHTML = ""; // Очистили от списка товаров (включая страницы и кнопки)
+            // Проверяем все фильтры и пушим элемент, если он проходит проверку:
             toSort.forEach(function(el) {
                 if (checkAll(el)) {
                     toShow.push(el);
                 }
             });
             this.goodsShow = toShow;
-        },
-        pageNumbers(count, container) {
-            const pages = document.querySelector(container);
-            if (pages.querySelector('nav')) pages.querySelector('nav').remove(); //! Сделать отдельный блок для номеров
-            const allNumbers = this.pagination.template.querySelectorAll('li');
-            allNumbers.forEach((el, i) => {
-                if (i > 0 && i < allNumbers.length-1) el.remove();
-            });
-            if (this.page.count > 1) {                
-                pages.appendChild(this.pagination.template);                
-
-                // console.log(count);
-                for (let i = 1; i <= count; i++) {
-                    const insertOne = document.createElement('li');
-                    insertOne.classList.add('page-item');
-                    insertOne.innerHTML = `<a class="page-link" href="${i}">${i}</a>`;
-                    this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
-                }
-            }
         },
         togglePerPage() {
             document.querySelector('.filter-perPage_select').addEventListener('change', function() {
@@ -288,6 +314,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 goodsContainer.createPages(goodsContainer.page.count, '.goods');
                 goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
                 goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+                goodsContainer.paginationIni();
             });
         }
     };
@@ -312,6 +339,7 @@ window.addEventListener('DOMContentLoaded', () => {
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
         goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
         goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+        goodsContainer.paginationIni();
         goodsContainer.togglePerPage();
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
     }
@@ -500,6 +528,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 goodsContainer.createPages(goodsContainer.page.count, '.goods');
                 goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
                 goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+                goodsContainer.paginationIni();
             }
 
             discountCheckbox.addEventListener('change', () => {
