@@ -159,6 +159,7 @@ window.addEventListener('DOMContentLoaded', () => {
         pagesArr: [],
         pagination: {},
         paginationArr: [],
+        toFirstLast: false,
         createPages(quantity, container) {
             this.pagesArr = [];
             document.querySelector(container).innerHTML = "";
@@ -178,25 +179,53 @@ window.addEventListener('DOMContentLoaded', () => {
             this.pagination.template.classList.add('my-pages');
             this.pagination.template.innerHTML = `<ul class="pagination">
                     <li class="page-item">
-                        <a class="page-link" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+                        <a class="page-link" target="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" aria-label="Next">
+                        <a class="page-link" target="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item is-hidden" skipped>
+                        <a class="page-link">...</a>
+                    </li>
+                    <li class="page-item is-hidden" skipped>
+                        <a class="page-link">...</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" target="Next">
                             <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" target="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
                         </a>
                     </li>
                 </ul>`
         },
         pageNumbers(count, container) {
+            this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
             this.paginationArr = [];
+            count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
+            const firstlast = this.pagination.template.querySelectorAll('[target="First"], [target="Last"]');
+            if (this.toFirstLast) {
+                firstlast.forEach(el => {
+                    el.classList.remove('is-hidden');
+                });
+            } else {
+                firstlast.forEach(el => {
+                    el.classList.add('is-hidden');
+                });
+            }
             const pages = document.querySelector(container);
             if (pages.querySelector('nav')) pages.querySelector('nav').remove();
             const allNumbers = this.pagination.template.querySelectorAll('li');
-            // Удаляем в шаблоне все элементы пагинации, кроме первого и последнего:
+            // Удаляем в шаблоне все элементы пагинации, кроме первых и последних 2-х:
             allNumbers.forEach((el, i) => {
-                if (i > 0 && i < allNumbers.length-1) el.remove();
+                if (i > 2 && i < allNumbers.length-3) el.remove();
             });
             if (this.page.count > 1) {                
                 pages.appendChild(this.pagination.template);                
@@ -206,14 +235,16 @@ window.addEventListener('DOMContentLoaded', () => {
                     const insertOne = document.createElement('li');
                     insertOne.classList.add('page-item');
                     insertOne.innerHTML = `<a class="page-link" target="${i}">${i}</a>`; // Может, без использования таргета буду назначать обработчики
-                    this.pagination.template.querySelectorAll('li')[i-1].after(insertOne);
+                    // Первая кнопка (i==0) вставляется после 3-го по счету элемента в пагинации. Дальше соответственно со сдвигом:
+                    this.pagination.template.querySelectorAll('li')[i+1].after(insertOne);
                     this.paginationArr.push(insertOne);
                 }
                 // console.log(this.paginationArr);
+                this.paginationSkipping();
             }
         },
+        // Назначает обработчик на клик по кнопкам пагинации
         paginationIni() {
-            this.currentPage = 0;
             this.pagesArr[this.currentPage].classList.remove('is-hidden');
             if (this.paginationArr.length > 0) {
                 this.paginationArr[this.currentPage].classList.add('active');
@@ -228,13 +259,37 @@ window.addEventListener('DOMContentLoaded', () => {
                                 this.paginationArr[page].classList.remove('active');
                             }
                         }
+                        this.paginationSkipping();
                     });
                 });
-            }            
+            }
+        },
+        paginationSkipping() {
+            const skipped = this.pagination.template.querySelectorAll('[skipped]');
+            // Отображение "..."
+            if (this.currentPage > 2) {
+                skipped[0].classList.remove('is-hidden');
+            } else {
+                skipped[0].classList.add('is-hidden');
+            }
+            if (this.currentPage < this.paginationArr.length-3) {
+                skipped[1].classList.remove('is-hidden');
+            } else {
+                skipped[1].classList.add('is-hidden');
+            }
+            // Скрытие лишних кнопок
+            this.paginationArr.forEach((el, i) => {
+                if (Math.abs(this.currentPage - i) > 2) {
+                    el.classList.add('is-hidden');
+                } else {
+                    el.classList.remove('is-hidden');
+                }
+
+            });
         },
         paginationNextPrevIni() {
             this.pagination.template.querySelectorAll('a').forEach((el, i) => {
-                const target = el.getAttribute("aria-label");
+                const target = el.getAttribute("target");
                 if (target == "Previous" || target == "Next") {
                     el.parentElement.addEventListener('click', () => {
                         this.pagesArr[this.currentPage].classList.add('is-hidden');
@@ -244,6 +299,16 @@ window.addEventListener('DOMContentLoaded', () => {
                         if (this.currentPage < 0) this.currentPage = 0;
                         this.pagesArr[this.currentPage].classList.remove('is-hidden');
                         this.paginationArr[this.currentPage].classList.add('active');
+                        this.paginationSkipping();
+                    });
+                } else if (target == "First" || target == "Last") {
+                    el.parentElement.addEventListener('click', () => {
+                        this.pagesArr[this.currentPage].classList.add('is-hidden');
+                        this.paginationArr[this.currentPage].classList.remove('active');
+                        target == "First" ? this.currentPage = 0 : this.currentPage = this.pagesArr.length-1;
+                        this.pagesArr[this.currentPage].classList.remove('is-hidden');
+                        this.paginationArr[this.currentPage].classList.add('active');
+                        this.paginationSkipping();
                     });
                 }
             });
@@ -261,7 +326,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     product.create();
                     product.checkSale();
                     page.appendChild(product.card);
-                    // this.goodsObjs.push(product);
+                    // this.goodsObjs.push(product); //* Пока не нужны были именно созданные объекты. Может, потом будет удобней работать с ними
                 }
     
             }
@@ -355,13 +420,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
+        // console.log(goodsContainer.goodsArr);
         goodsContainer.paginationTemplateIni();
         goodsContainer.checkFilters('.goods');
         goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
-        goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
+        goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods'); // На этом этапе в вёрстку вставляются карточки товаров через классы
         goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
-        goodsContainer.paginationIni();
+        goodsContainer.paginationIni(); // Назначает обработчик на клик по кнопкам пагинации
         goodsContainer.togglePerPage();
         goodsContainer.paginationNextPrevIni();
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
@@ -458,12 +524,6 @@ window.addEventListener('DOMContentLoaded', () => {
             const catSelect = document.querySelector('.filter-category_select'),
                 goodsWrapper = document.querySelector('.goods'),
                 categories = goodsWrapper.querySelectorAll('.productcard__category');
-                // categories.forEach(cat => {
-                //     const catOption = document.createElement('option');
-                //     catOption.setAttribute('value', cat.textContent);
-                //     catOption.textContent = cat.textContent;
-                //     catSelect.appendChild(catOption);
-                // });
                 categories.forEach(cat => {
                     if (catSelect.querySelector(`option[value = '${cat.textContent}']`)) {
                         // return false; //? Надо ли это?
@@ -485,65 +545,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 searchBtn = document.querySelector('#search'),
                 searchInput = searchBtn.previousElementSibling,
                 catSelect = document.querySelector('.filter-category_select');
-        
-            // function checkDiscount(toFilter) {
-            //     // const goods = document.querySelectorAll('.productcard');
-            //     toFilter.forEach((el, i) => {
-            //         const isSale = el.getAttribute("data-sale");
-            //         if (discountCheckbox.checked){ //? а могли бы использовать this с обычной функцией? - Да
-            //             // console.log(el)
-            //             if (isSale=='false') {
-            //                 el.remove();
-            //                 // toFilter.splice(i, 1);
-            //             } else {
-            //             goodsWrapper.appendChild(el);
-            //         }
-            //         }
-            //     });
-            // }
-
-            // function checkPrice(toFilter) {
-            //     // const goods = document.querySelectorAll('.productcard');
-            //     toFilter.forEach((el, i) => {
-            //         const cardPrice = el.querySelector('.productcard__price');
-            //         const price = parseFloat(cardPrice.textContent);
-            //         // console.log(price);
-            //         if ((min.value && price <= min.value) || (max.value && price >= max.value)) {
-            //             el.remove();
-            //             // toFilter.splice(i, 1);
-            //         } else {
-            //             goodsWrapper.appendChild(el);
-            //         }
-            //     });
-            // }
-
-            // function checkSearch(toFilter) {
-            //     const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
-            //     // const goods = document.querySelectorAll('.productcard');
-            //     // метод trim() убирает лишние пробелы по бокам
-            //     // console.log(searchText);
-            //     toFilter.forEach((el, i) => {
-            //         const title = el.querySelector('.productcard__title');
-            //         if (!searchText.test(title.textContent)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
-            //             el.remove();
-            //             // toFilter.splice(i, 1);
-            //         } else {
-            //             goodsWrapper.appendChild(el);
-            //         }
-            //     });
-            // }
-
-            // function checkCategory(toFilter) {
-            //     toFilter.forEach((el, i) =>{
-            //         const cardCategory = el.querySelector('.productcard__category');
-            //         if (cardCategory.innerText !== catSelect.value && catSelect.value !== "all") {
-            //             el.remove();
-            //             // toFilter.splice(i, 1);
-            //         } else {
-            //             goodsWrapper.appendChild(el);
-            //         }
-            //     });
-            // }
 
             function checkAll() {
                 goodsContainer.checkFilters('.goods');
@@ -562,7 +563,7 @@ window.addEventListener('DOMContentLoaded', () => {
             max.addEventListener('change', checkAll);
         
             searchBtn.parentElement.addEventListener('submit', (e) => {
-                event.preventDefault();
+                e.preventDefault();
                 checkAll();
                 // return false; // Надо ли? - НЕТ
             });
