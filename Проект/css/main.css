@@ -461,3 +461,7 @@ input.productcard__quantity {
 .pagination {
     justify-content: center;
 }
+
+.pagination * {
+    z-index: 0;
+}
