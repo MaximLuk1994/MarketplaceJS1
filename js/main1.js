@@ -149,18 +149,18 @@ window.addEventListener('DOMContentLoaded', () => {
     // let cart = {};
 
     // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
-    let goodsContainer = {
-        page: {},
-        perPage: 8,
-        currentPage: 0,
-        goodsArr: [],
-        goodsShow: [],
-        // goodsObjs: [],
-        pagesArr: [],
-        pagination: {},
-        paginationArr: [],
-        toFirstLast: false,
-        createPages(quantity, container) {
+    let goodsContainer = new Object();
+        goodsContainer.page = {};
+        goodsContainer.perPage = 8;
+        goodsContainer.currentPage = 0;
+        goodsContainer.goodsArr = [];
+        goodsContainer.goodsShow = [];
+        // goodsContainer.goodsObjs = [];
+        goodsContainer.pagesArr = [];
+        goodsContainer.pagination = {};
+        goodsContainer.paginationArr = [];
+        goodsContainer.toFirstLast = false;
+        goodsContainer.createPages = function(quantity, container) {
             this.pagesArr = [];
             document.querySelector(container).innerHTML = "";
             this.page.template = document.createElement('div');
@@ -173,8 +173,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 this.pagesArr.push(page);
             }
             // console.log(this.pagesArr);
-        },
-        paginationTemplateIni() {
+        };
+        goodsContainer.paginationTemplateIni = function() {
             this.pagination.template = document.createElement('nav');
             this.pagination.template.classList.add('my-pages');
             this.pagination.template.innerHTML = `<ul class="pagination">
@@ -205,8 +205,8 @@ window.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </li>
                 </ul>`
-        },
-        pageNumbers(count, container) {
+        };
+        goodsContainer.pageNumbers = function(count, container) {
             this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
             this.paginationArr = [];
             count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
@@ -242,9 +242,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 // console.log(this.paginationArr);
                 this.paginationSkipping();
             }
-        },
+        };
         // Назначает обработчик на клик по кнопкам пагинации
-        paginationIni() {
+        goodsContainer.paginationIni = function() {
             this.pagesArr[this.currentPage].classList.remove('is-hidden');
             if (this.paginationArr.length > 0) {
                 this.paginationArr[this.currentPage].classList.add('active');
@@ -263,8 +263,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     });
                 });
             }
-        },
-        paginationSkipping() {
+        };
+        goodsContainer.paginationSkipping = function() {
             const skipped = this.pagination.template.querySelectorAll('[skipped]');
             // Отображение "..."
             if (this.currentPage > 2) {
@@ -286,8 +286,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
 
             });
-        },
-        paginationNextPrevIni() {
+        };
+        goodsContainer.paginationNextPrevIni = function() {
             this.pagination.template.querySelectorAll('a').forEach((el, i) => {
                 const target = el.getAttribute("target");
                 if (target == "Previous" || target == "Next") {
@@ -312,12 +312,12 @@ window.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
-        },
-        countPages(perPage, arr) {
+        };
+        goodsContainer.countPages = function(perPage, arr) {
             this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
             this.page.count = Math.ceil(arr.length / this.page.perPage);
-        },
-        spreadPages(arr, container) {
+        };
+        goodsContainer.spreadPages = function(arr, container) {
             for (let i = 1; i <=goodsContainer.page.count; i++) {
                 const pagesWrapper = document.querySelector(container);
                 const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
@@ -331,8 +331,8 @@ window.addEventListener('DOMContentLoaded', () => {
     
             }
             // console.log(this.goodsObjs);
-        },
-        checkFilters(container) {
+        };
+        goodsContainer.checkFilters = function(container) {
             const goodsWrapper = document.querySelector(container),
                 discountCheckbox = document.querySelector('#discount-checkbox'),
                 min = document.getElementById('min'),
@@ -393,8 +393,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             });
             this.goodsShow = toShow;
-        },
-        togglePerPage() {
+        };
+        goodsContainer.togglePerPage = function() {
             document.querySelector('.filter-perPage_select').addEventListener('change', function() {
                 goodsContainer.perPage = this.value;
                 goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
@@ -403,8 +403,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
                 goodsContainer.paginationIni();
             });
-        }
-    };
+        };
 
 
 
