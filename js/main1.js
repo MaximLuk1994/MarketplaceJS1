@@ -150,260 +150,261 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Нужно будет засунуть инициализацию блока goods до инициализации карточек товаров
     let goodsContainer = new Object();
-        goodsContainer.page = {};
-        goodsContainer.perPage = 8;
-        goodsContainer.currentPage = 0;
-        goodsContainer.goodsArr = [];
-        goodsContainer.goodsShow = [];
-        // goodsContainer.goodsObjs = [];
-        goodsContainer.pagesArr = [];
-        goodsContainer.pagination = {};
-        goodsContainer.paginationArr = [];
-        goodsContainer.toFirstLast = false;
-        goodsContainer.createPages = function(quantity, container) {
-            this.pagesArr = [];
-            document.querySelector(container).innerHTML = "";
-            this.page.template = document.createElement('div');
-            this.page.template.classList.add('goods__page');
-            for (let i = 1; i <= quantity; i++) {
-                const page = this.page.template.cloneNode(true);
-                page.setAttribute('data-page', i);
-                page.classList.toggle('is-hidden');
-                document.querySelector(container).appendChild(page);
-                this.pagesArr.push(page);
-            }
-            // console.log(this.pagesArr);
-        };
-        goodsContainer.paginationTemplateIni = function() {
-            this.pagination.template = document.createElement('nav');
-            this.pagination.template.classList.add('my-pages');
-            this.pagination.template.innerHTML = `<ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link" target="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" target="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item is-hidden" skipped>
-                        <a class="page-link">...</a>
-                    </li>
-                    <li class="page-item is-hidden" skipped>
-                        <a class="page-link">...</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" target="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" target="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                </ul>`
-        };
-        goodsContainer.pageNumbers = function(count, container) {
-            this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
-            this.paginationArr = [];
-            count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
-            const firstlast = this.pagination.template.querySelectorAll('[target="First"], [target="Last"]');
-            if (this.toFirstLast) {
-                firstlast.forEach(el => {
-                    el.classList.remove('is-hidden');
-                });
-            } else {
-                firstlast.forEach(el => {
-                    el.classList.add('is-hidden');
-                });
-            }
-            const pages = document.querySelector(container);
-            if (pages.querySelector('nav')) pages.querySelector('nav').remove();
-            const allNumbers = this.pagination.template.querySelectorAll('li');
-            // Удаляем в шаблоне все элементы пагинации, кроме первых и последних 2-х:
-            allNumbers.forEach((el, i) => {
-                if (i > 2 && i < allNumbers.length-3) el.remove();
+    goodsContainer.page = {};
+    goodsContainer.perPage = 8;
+    goodsContainer.currentPage = 0;
+    goodsContainer.goodsArr = [];
+    goodsContainer.goodsShow = [];
+    // goodsContainer.goodsObjs = [];
+    goodsContainer.pagesArr = [];
+    goodsContainer.pagination = {};
+    goodsContainer.paginationArr = [];
+    goodsContainer.toFirstLast = false;
+    goodsContainer.createPages = function(quantity, container) {
+        this.pagesArr = [];
+        document.querySelector(container).innerHTML = "";
+        this.page.template = document.createElement('div');
+        this.page.template.classList.add('goods__page');
+        for (let i = 1; i <= quantity; i++) {
+            const page = this.page.template.cloneNode(true);
+            page.setAttribute('data-page', i);
+            page.classList.toggle('is-hidden');
+            document.querySelector(container).appendChild(page);
+            this.pagesArr.push(page);
+        }
+        // console.log(this.pagesArr);
+    };
+    goodsContainer.pagination.template = document.createElement('nav');
+    goodsContainer.pagination.template.classList.add('my-pages');
+    goodsContainer.pagination.template.innerHTML = `<ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" target="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" target="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item is-hidden" skipped>
+                <a class="page-link">...</a>
+            </li>
+            <li class="page-item is-hidden" skipped>
+                <a class="page-link">...</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" target="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" target="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+        </ul>`;
+    // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней")
+    goodsContainer.pageNumbers = function(count, container) {
+        this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
+        this.paginationArr = [];
+        count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
+        const firstlast = this.pagination.template.querySelectorAll('[target="First"], [target="Last"]');
+        if (this.toFirstLast) {
+            firstlast.forEach(el => {
+                el.classList.remove('is-hidden');
             });
-            if (this.page.count > 1) {                
-                pages.appendChild(this.pagination.template);                
+        } else {
+            firstlast.forEach(el => {
+                el.classList.add('is-hidden');
+            });
+        }
+        const pages = document.querySelector(container);
+        if (pages.querySelector('nav')) pages.querySelector('nav').remove();
+        const allNumbers = this.pagination.template.querySelectorAll('li');
+        // Удаляем в шаблоне все элементы пагинации, кроме первых и последних 2-х:
+        allNumbers.forEach((el, i) => {
+            if (i > 2 && i < allNumbers.length-3) el.remove();
+        });
+        if (this.page.count > 1) {                
+            pages.appendChild(this.pagination.template);                
 
-                // console.log(count);
-                for (let i = 1; i <= count; i++) {
-                    const insertOne = document.createElement('li');
-                    insertOne.classList.add('page-item');
-                    insertOne.innerHTML = `<a class="page-link" target="${i}">${i}</a>`; // Может, без использования таргета буду назначать обработчики
-                    // Первая кнопка (i==0) вставляется после 3-го по счету элемента в пагинации. Дальше соответственно со сдвигом:
-                    this.pagination.template.querySelectorAll('li')[i+1].after(insertOne);
-                    this.paginationArr.push(insertOne);
-                }
-                // console.log(this.paginationArr);
-                this.paginationSkipping();
+            // console.log(count);
+            for (let i = 1; i <= count; i++) {
+                const insertOne = document.createElement('li');
+                insertOne.classList.add('page-item');
+                insertOne.innerHTML = `<a class="page-link" target="${i}">${i}</a>`; // Может, без использования таргета буду назначать обработчики
+                // Первая кнопка (i==0) вставляется после 3-го по счету элемента в пагинации. Дальше соответственно со сдвигом:
+                this.pagination.template.querySelectorAll('li')[i+1].after(insertOne);
+                this.paginationArr.push(insertOne);
             }
-        };
-        // Назначает обработчик на клик по кнопкам пагинации
-        goodsContainer.paginationIni = function() {
-            this.pagesArr[this.currentPage].classList.remove('is-hidden');
-            if (this.paginationArr.length > 0) {
-                this.paginationArr[this.currentPage].classList.add('active');
-                this.paginationArr.forEach((el, i) => {
-                    el.addEventListener('click', () => {
-                        this.pagesArr[i].classList.remove('is-hidden');
-                        this.paginationArr[i].classList.add('active');
-                        this.currentPage = i;
-                        for (let page = 0; page < this.pagesArr.length; page++) {
-                            if (page != i) {
-                                this.pagesArr[page].classList.add('is-hidden');
-                                this.paginationArr[page].classList.remove('active');
-                            }
-                        }
-                        this.paginationSkipping();
-                    });
-                });
-            }
-        };
-        goodsContainer.paginationSkipping = function() {
-            const skipped = this.pagination.template.querySelectorAll('[skipped]');
-            // Отображение "..."
-            if (this.currentPage > 2) {
-                skipped[0].classList.remove('is-hidden');
-            } else {
-                skipped[0].classList.add('is-hidden');
-            }
-            if (this.currentPage < this.paginationArr.length-3) {
-                skipped[1].classList.remove('is-hidden');
-            } else {
-                skipped[1].classList.add('is-hidden');
-            }
-            // Скрытие лишних кнопок
+            // console.log(this.paginationArr);
+            this.paginationSkipping();
+        }
+    };
+    // Назначает обработчик на клик по кнопкам пагинации
+    goodsContainer.paginationIni = function() {
+        this.pagesArr[this.currentPage].classList.remove('is-hidden');
+        if (this.paginationArr.length > 0) {
+            this.paginationArr[this.currentPage].classList.add('active');
             this.paginationArr.forEach((el, i) => {
-                if (Math.abs(this.currentPage - i) > 2) {
-                    el.classList.add('is-hidden');
-                } else {
-                    el.classList.remove('is-hidden');
-                }
-
-            });
-        };
-        goodsContainer.paginationNextPrevIni = function() {
-            this.pagination.template.querySelectorAll('a').forEach(el => {
-                const target = el.getAttribute("target");
-                if (target == "Previous" || target == "Next") {
-                    el.parentElement.addEventListener('click', () => {
-                        this.pagesArr[this.currentPage].classList.add('is-hidden');
-                        this.paginationArr[this.currentPage].classList.remove('active');
-                        target == "Previous" ? this.currentPage-- : this.currentPage++;
-                        if (this.currentPage > this.pagesArr.length-1) this.currentPage = this.pagesArr.length-1;
-                        if (this.currentPage < 0) this.currentPage = 0;
-                        this.pagesArr[this.currentPage].classList.remove('is-hidden');
-                        this.paginationArr[this.currentPage].classList.add('active');
-                        this.paginationSkipping();
-                    });
-                } else if (target == "First" || target == "Last") {
-                    el.parentElement.addEventListener('click', () => {
-                        this.pagesArr[this.currentPage].classList.add('is-hidden');
-                        this.paginationArr[this.currentPage].classList.remove('active');
-                        target == "First" ? this.currentPage = 0 : this.currentPage = this.pagesArr.length-1;
-                        this.pagesArr[this.currentPage].classList.remove('is-hidden');
-                        this.paginationArr[this.currentPage].classList.add('active');
-                        this.paginationSkipping();
-                    });
-                }
-            });
-        };
-        goodsContainer.countPages = function(perPage, arr) {
-            this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
-            this.page.count = Math.ceil(arr.length / this.page.perPage);
-        };
-        goodsContainer.spreadPages = function(arr, container) {
-            for (let i = 1; i <=goodsContainer.page.count; i++) {
-                const pagesWrapper = document.querySelector(container);
-                const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
-                for (let j = goodsContainer.page.perPage*(i-1)+1; j <= goodsContainer.page.perPage*i && j <= arr.length; j++) {
-                    let product = new ProductCard(arr[j-1].id, arr[j-1].sale, arr[j-1].img, arr[j-1].price, arr[j-1].category, arr[j-1].title);
-                    product.create();
-                    product.checkSale();
-                    page.appendChild(product.card);
-                    // this.goodsObjs.push(product); //* Пока не нужны были именно созданные объекты. Может, потом будет удобней работать с ними
-                }
-    
-            }
-            // console.log(this.goodsObjs);
-        };
-        goodsContainer.checkFilters = function(container) {
-            const goodsWrapper = document.querySelector(container),
-                discountCheckbox = document.querySelector('#discount-checkbox'),
-                min = document.getElementById('min'),
-                max = document.getElementById('max'),
-                searchBtn = document.querySelector('#search'),
-                searchInput = searchBtn.previousElementSibling,
-                catSelect = document.querySelector('.filter-category_select');
-
-            let toSort = this.goodsArr,
-                toShow = [];
-
-            function checkDiscount(el) {
-                if (discountCheckbox.checked){
-                    if (el.sale) {
-                        return true;
-                    } else {
-                        return false;
+                el.addEventListener('click', () => {
+                    this.pagesArr[i].classList.remove('is-hidden');
+                    this.paginationArr[i].classList.add('active');
+                    this.currentPage = i;
+                    for (let page = 0; page < this.pagesArr.length; page++) {
+                        if (page != i) {
+                            this.pagesArr[page].classList.add('is-hidden');
+                            this.paginationArr[page].classList.remove('active');
+                        }
                     }
-                } else {
-                    return true;
-                }
+                    this.paginationSkipping();
+                });
+            });
+        }
+    };
+    // Проверка необходимости вставки єлемента "..." между кнопками пагинации
+    goodsContainer.paginationSkipping = function() {
+        const skipped = this.pagination.template.querySelectorAll('[skipped]');
+        // Отображение "..."
+        if (this.currentPage > 2) {
+            skipped[0].classList.remove('is-hidden');
+        } else {
+            skipped[0].classList.add('is-hidden');
+        }
+        if (this.currentPage < this.paginationArr.length-3) {
+            skipped[1].classList.remove('is-hidden');
+        } else {
+            skipped[1].classList.add('is-hidden');
+        }
+        // Скрытие лишних кнопок
+        this.paginationArr.forEach((el, i) => {
+            if (Math.abs(this.currentPage - i) > 2) {
+                el.classList.add('is-hidden');
+            } else {
+                el.classList.remove('is-hidden');
             }
 
-            function checkPrice(el) {
-                if ((min.value && el.price < min.value) || (max.value && el.price > max.value)) {
-                    return false;
-                } else {
-                    return true;
-                }
+        });
+    };
+    goodsContainer.paginationNextPrevIni = function() {
+        this.pagination.template.querySelectorAll('a').forEach(el => {
+            const target = el.getAttribute("target");
+            if (target == "Previous" || target == "Next") {
+                el.parentElement.addEventListener('click', () => {
+                    this.pagesArr[this.currentPage].classList.add('is-hidden');
+                    this.paginationArr[this.currentPage].classList.remove('active');
+                    target == "Previous" ? this.currentPage-- : this.currentPage++;
+                    if (this.currentPage > this.pagesArr.length-1) this.currentPage = this.pagesArr.length-1;
+                    if (this.currentPage < 0) this.currentPage = 0;
+                    this.pagesArr[this.currentPage].classList.remove('is-hidden');
+                    this.paginationArr[this.currentPage].classList.add('active');
+                    this.paginationSkipping();
+                });
+            } else if (target == "First" || target == "Last") {
+                el.parentElement.addEventListener('click', () => {
+                    this.pagesArr[this.currentPage].classList.add('is-hidden');
+                    this.paginationArr[this.currentPage].classList.remove('active');
+                    target == "First" ? this.currentPage = 0 : this.currentPage = this.pagesArr.length-1;
+                    this.pagesArr[this.currentPage].classList.remove('is-hidden');
+                    this.paginationArr[this.currentPage].classList.add('active');
+                    this.paginationSkipping();
+                });
+            }
+        });
+    };
+    goodsContainer.countPages = function(perPage, arr) {
+        this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
+        this.page.count = Math.ceil(arr.length / this.page.perPage);
+    };
+    goodsContainer.spreadPages = function(arr, container) {
+        for (let i = 1; i <=goodsContainer.page.count; i++) {
+            const pagesWrapper = document.querySelector(container);
+            const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
+            for (let j = goodsContainer.page.perPage*(i-1)+1; j <= goodsContainer.page.perPage*i && j <= arr.length; j++) {
+                let product = new ProductCard(arr[j-1].id, arr[j-1].sale, arr[j-1].img, arr[j-1].price, arr[j-1].category, arr[j-1].title);
+                product.create();
+                product.checkSale();
+                page.appendChild(product.card);
+                // this.goodsObjs.push(product); //* Пока не нужны были именно созданные объекты. Может, потом будет удобней работать с ними
             }
 
-            function checkSearch(el) {
-                const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
-                if (!searchText.test(el.title)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
-                    return false;
-                } else {
+        }
+        // console.log(this.goodsObjs);
+    };
+    // Формирование массива goodsShow
+    goodsContainer.checkFilters = function(container) {
+        const goodsWrapper = document.querySelector(container),
+            discountCheckbox = document.querySelector('#discount-checkbox'),
+            min = document.getElementById('min'),
+            max = document.getElementById('max'),
+            searchBtn = document.querySelector('#search'),
+            searchInput = searchBtn.previousElementSibling,
+            catSelect = document.querySelector('.filter-category_select');
+
+        let toSort = this.goodsArr,
+            toShow = [];
+
+        function checkDiscount(el) {
+            if (discountCheckbox.checked){
+                if (el.sale) {
                     return true;
+                } else {
+                    return false;
                 }
+            } else {
+                return true;
+            }
         }
 
-            function checkCategory(el) {
-                if (el.category !== catSelect.value && catSelect.value !== "all") {
-                    return false;
-                } else {
-                    return true;
-                }
+        function checkPrice(el) {
+            if ((min.value && el.price < min.value) || (max.value && el.price > max.value)) {
+                return false;
+            } else {
+                return true;
             }
+        }
 
-            function checkAll(el) {
-                return (checkDiscount(el) && checkPrice(el) && checkSearch(el) && checkCategory(el));
+        function checkSearch(el) {
+            const searchText = new RegExp(searchInput.value.trim(), 'i'); //? регулярное выражение https://regexr.com/
+            if (!searchText.test(el.title)) { // Проверяем, есть ли регулярное выражение searchText в тексте title.textContent. Возвращает булевое значение
+                return false;
+            } else {
+                return true;
             }
+    }
 
-            goodsWrapper.innerHTML = ""; // Очистили от списка товаров (включая страницы и кнопки)
-            // Проверяем все фильтры и пушим элемент, если он проходит проверку:
-            toSort.forEach(function(el) {
-                if (checkAll(el)) {
-                    toShow.push(el);
-                }
-            });
-            this.goodsShow = toShow;
-        };
-        goodsContainer.togglePerPage = function() {
-            document.querySelector('.filter-perPage_select').addEventListener('change', function() {
-                goodsContainer.perPage = this.value;
-                goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
-                goodsContainer.createPages(goodsContainer.page.count, '.goods');
-                goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
-                goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
-                goodsContainer.paginationIni();
-            });
-        };
+        function checkCategory(el) {
+            if (el.category !== catSelect.value && catSelect.value !== "all") {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function checkAll(el) {
+            return (checkDiscount(el) && checkPrice(el) && checkSearch(el) && checkCategory(el));
+        }
+
+        goodsWrapper.innerHTML = ""; // Очистили от списка товаров (включая страницы и кнопки)
+        // Проверяем все фильтры и пушим элемент, если он проходит проверку:
+        toSort.forEach(function(el) {
+            if (checkAll(el)) {
+                toShow.push(el);
+            }
+        });
+        this.goodsShow = toShow;
+    };
+    goodsContainer.togglePerPage = function() {
+        document.querySelector('.filter-perPage_select').addEventListener('change', function() {
+            goodsContainer.perPage = this.value;
+            goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
+            goodsContainer.createPages(goodsContainer.page.count, '.goods');
+            goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
+            goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+            goodsContainer.paginationIni();
+        });
+    };
 
 
 
@@ -420,14 +421,14 @@ window.addEventListener('DOMContentLoaded', () => {
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
         // console.log(goodsContainer.goodsArr);
-        goodsContainer.checkFilters('.goods');
-        goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
+        goodsContainer.checkFilters('.goods'); // Формирует массив goodsShow из goodsArr с учётом применённых фильтров
+        goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow); // Определяет page.count
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
         goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods'); // На этом этапе в вёрстку вставляются карточки товаров через классы
-        goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
+        goodsContainer.pageNumbers(goodsContainer.page.count,'.pages'); // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней")
         goodsContainer.paginationIni(); // Назначает обработчик на клик по кнопкам пагинации
-        goodsContainer.togglePerPage();
-        goodsContainer.paginationNextPrevIni();
+        goodsContainer.togglePerPage(); // Активируется работа селекта perPage
+        goodsContainer.paginationNextPrevIni(); // Активируются боковые кнопки переключения страниц
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
     }
 
