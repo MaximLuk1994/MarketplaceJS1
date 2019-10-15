@@ -288,7 +288,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         };
         goodsContainer.paginationNextPrevIni = function() {
-            this.pagination.template.querySelectorAll('a').forEach((el, i) => {
+            this.pagination.template.querySelectorAll('a').forEach(el => {
                 const target = el.getAttribute("target");
                 if (target == "Previous" || target == "Next") {
                     el.parentElement.addEventListener('click', () => {
@@ -420,7 +420,6 @@ window.addEventListener('DOMContentLoaded', () => {
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
         // console.log(goodsContainer.goodsArr);
-        goodsContainer.paginationTemplateIni();
         goodsContainer.checkFilters('.goods');
         goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
         goodsContainer.createPages(goodsContainer.page.count, '.goods');
