@@ -160,20 +160,6 @@ window.addEventListener('DOMContentLoaded', () => {
     goodsContainer.pagination = {};
     goodsContainer.paginationArr = [];
     goodsContainer.toFirstLast = false;
-    goodsContainer.createPages = function(quantity, container) {
-        this.pagesArr = [];
-        document.querySelector(container).innerHTML = "";
-        this.page.template = document.createElement('div');
-        this.page.template.classList.add('goods__page');
-        for (let i = 1; i <= quantity; i++) {
-            const page = this.page.template.cloneNode(true);
-            page.setAttribute('data-page', i);
-            page.classList.toggle('is-hidden');
-            document.querySelector(container).appendChild(page);
-            this.pagesArr.push(page);
-        }
-        // console.log(this.pagesArr);
-    };
     goodsContainer.pagination.template = document.createElement('nav');
     goodsContainer.pagination.template.classList.add('my-pages');
     goodsContainer.pagination.template.innerHTML = `<ul class="pagination">
@@ -204,11 +190,49 @@ window.addEventListener('DOMContentLoaded', () => {
                 </a>
             </li>
         </ul>`;
+        goodsContainer.countPages = function() {
+            this.page.count = Math.ceil(this.goodsShow.length / this.perPage);
+            // console.log(this.page.count);
+        };
+        goodsContainer.createPages = function() {
+            this.pagesArr = [];
+            document.querySelector('.goods').innerHTML = "";
+            this.page.template = document.createElement('div');
+            this.page.template.classList.add('goods__page');
+            for (let i = 1; i <= this.page.count; i++) {
+                const page = this.page.template.cloneNode(true);
+                page.setAttribute('data-page', i);
+                page.classList.add('is-hidden');
+                document.querySelector('.goods').appendChild(page);
+                this.pagesArr.push(page);
+            }
+            // console.log(this.pagesArr);
+        };
+        goodsContainer.spreadPages = function() {
+            for (let i = 1; i <=goodsContainer.page.count; i++) {
+                const pagesWrapper = document.querySelector('.goods');
+                const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
+                for (let j = goodsContainer.perPage*(i-1)+1; j <= goodsContainer.perPage*i && j <= this.goodsShow.length; j++) {
+                    let product = new ProductCard(this.goodsShow[j-1].id, this.goodsShow[j-1].sale, this.goodsShow[j-1].img, this.goodsShow[j-1].price, this.goodsShow[j-1].category, this.goodsShow[j-1].title);
+                    product.create();
+                    product.checkSale();
+                    page.appendChild(product.card);
+                    // this.goodsObjs.push(product); //* Пока не нужны были именно созданные объекты. Может, потом будет удобней работать с ними
+                }
+    
+            }
+            // console.log(this.goodsObjs);
+        };
+        goodsContainer.completePages = function() {
+            goodsContainer.countPages(); // Определяет page.count
+            goodsContainer.createPages();
+            goodsContainer.spreadPages(); // На этом этапе в вёрстку вставляются карточки товаров через классы
+        };
     // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней")
-    goodsContainer.pageNumbers = function(count, container) {
+    goodsContainer.paginationNumbers = function() {
         this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
         this.paginationArr = [];
-        count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
+        this.page.count > 3 ? this.toFirstLast = true : this.toFirstLast = false;
         const firstlast = this.pagination.template.querySelectorAll('[target="First"], [target="Last"]');
         if (this.toFirstLast) {
             firstlast.forEach(el => {
@@ -219,7 +243,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 el.classList.add('is-hidden');
             });
         }
-        const pages = document.querySelector(container);
+        const pages = document.querySelector('.pages');
         if (pages.querySelector('nav')) pages.querySelector('nav').remove();
         const allNumbers = this.pagination.template.querySelectorAll('li');
         // Удаляем в шаблоне все элементы пагинации, кроме первых и последних 2-х:
@@ -230,7 +254,7 @@ window.addEventListener('DOMContentLoaded', () => {
             pages.appendChild(this.pagination.template);                
 
             // console.log(count);
-            for (let i = 1; i <= count; i++) {
+            for (let i = 1; i <= this.page.count; i++) {
                 const insertOne = document.createElement('li');
                 insertOne.classList.add('page-item');
                 insertOne.innerHTML = `<a class="page-link" target="${i}">${i}</a>`; // Может, без использования таргета буду назначать обработчики
@@ -241,9 +265,11 @@ window.addEventListener('DOMContentLoaded', () => {
             // console.log(this.paginationArr);
             this.paginationSkipping();
         }
+        goodsContainer.paginationIni();
     };
     // Назначает обработчик на клик по кнопкам пагинации
     goodsContainer.paginationIni = function() {
+        // console.log(this.currentPage);
         this.pagesArr[this.currentPage].classList.remove('is-hidden');
         if (this.paginationArr.length > 0) {
             this.paginationArr[this.currentPage].classList.add('active');
@@ -287,6 +313,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         });
     };
+    // Активируются боковые кнопки переключения страниц:
     goodsContainer.paginationNextPrevIni = function() {
         this.pagination.template.querySelectorAll('a').forEach(el => {
             const target = el.getAttribute("target");
@@ -313,28 +340,9 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-    goodsContainer.countPages = function(perPage, arr) {
-        this.page.perPage = perPage; // Количество товаров на странице, будем вытягивать из вёрстки
-        this.page.count = Math.ceil(arr.length / this.page.perPage);
-    };
-    goodsContainer.spreadPages = function(arr, container) {
-        for (let i = 1; i <=goodsContainer.page.count; i++) {
-            const pagesWrapper = document.querySelector(container);
-            const page = pagesWrapper.querySelector(`[data-page="${i}"]`);
-            for (let j = goodsContainer.page.perPage*(i-1)+1; j <= goodsContainer.page.perPage*i && j <= arr.length; j++) {
-                let product = new ProductCard(arr[j-1].id, arr[j-1].sale, arr[j-1].img, arr[j-1].price, arr[j-1].category, arr[j-1].title);
-                product.create();
-                product.checkSale();
-                page.appendChild(product.card);
-                // this.goodsObjs.push(product); //* Пока не нужны были именно созданные объекты. Может, потом будет удобней работать с ними
-            }
-
-        }
-        // console.log(this.goodsObjs);
-    };
     // Формирование массива goodsShow
-    goodsContainer.checkFilters = function(container) {
-        const goodsWrapper = document.querySelector(container),
+    goodsContainer.checkFilters = function() {
+        const goodsWrapper = document.querySelector('.goods'),
             discountCheckbox = document.querySelector('#discount-checkbox'),
             min = document.getElementById('min'),
             max = document.getElementById('max'),
@@ -372,7 +380,7 @@ window.addEventListener('DOMContentLoaded', () => {
             } else {
                 return true;
             }
-    }
+        }
 
         function checkCategory(el) {
             if (el.category !== catSelect.value && catSelect.value !== "all") {
@@ -398,11 +406,8 @@ window.addEventListener('DOMContentLoaded', () => {
     goodsContainer.togglePerPage = function() {
         document.querySelector('.filter-perPage_select').addEventListener('change', function() {
             goodsContainer.perPage = this.value;
-            goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
-            goodsContainer.createPages(goodsContainer.page.count, '.goods');
-            goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
-            goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
-            goodsContainer.paginationIni();
+            goodsContainer.completePages();
+            goodsContainer.paginationNumbers();
         });
     };
 
@@ -421,12 +426,9 @@ window.addEventListener('DOMContentLoaded', () => {
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
         // console.log(goodsContainer.goodsArr);
-        goodsContainer.checkFilters('.goods'); // Формирует массив goodsShow из goodsArr с учётом применённых фильтров
-        goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow); // Определяет page.count
-        goodsContainer.createPages(goodsContainer.page.count, '.goods');
-        goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods'); // На этом этапе в вёрстку вставляются карточки товаров через классы
-        goodsContainer.pageNumbers(goodsContainer.page.count,'.pages'); // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней")
-        goodsContainer.paginationIni(); // Назначает обработчик на клик по кнопкам пагинации
+        goodsContainer.checkFilters(); // Формирует массив goodsShow из goodsArr с учётом применённых фильтров
+        goodsContainer.completePages(); // Определяет page.count (countPages), создаёт страницы (скрытые) (createPages), вставляются карточки товаров (spreadPages)
+        goodsContainer.paginationNumbers(); // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней") + Назначает обработчик на клик по кнопкам пагинации и снимается hidden с активной страницы
         goodsContainer.togglePerPage(); // Активируется работа селекта perPage
         goodsContainer.paginationNextPrevIni(); // Активируются боковые кнопки переключения страниц
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
@@ -546,12 +548,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 catSelect = document.querySelector('.filter-category_select');
 
             function checkAll() {
-                goodsContainer.checkFilters('.goods');
-                goodsContainer.countPages(goodsContainer.perPage, goodsContainer.goodsShow);
-                goodsContainer.createPages(goodsContainer.page.count, '.goods');
-                goodsContainer.spreadPages(goodsContainer.goodsShow,'.goods');
-                goodsContainer.pageNumbers(goodsContainer.page.count,'.pages');
-                goodsContainer.paginationIni();
+                goodsContainer.checkFilters();
+                goodsContainer.completePages();
+                goodsContainer.paginationNumbers();
             }
 
             discountCheckbox.addEventListener('change', () => {
