@@ -153,6 +153,7 @@ window.addEventListener('DOMContentLoaded', () => {
     goodsContainer.page = {};
     goodsContainer.perPage = 8;
     goodsContainer.currentPage = 0;
+    goodsContainer.filters = {};
     goodsContainer.goodsArr = [];
     goodsContainer.goodsShow = [];
     // goodsContainer.goodsObjs = [];
@@ -193,7 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
         goodsContainer.countPages = function() {
             this.page.count = Math.ceil(this.goodsShow.length / this.perPage);
             // console.log(this.page.count);
-        };
+        }
         goodsContainer.createPages = function() {
             this.pagesArr = [];
             document.querySelector('.goods').innerHTML = "";
@@ -207,7 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 this.pagesArr.push(page);
             }
             // console.log(this.pagesArr);
-        };
+        }
         goodsContainer.spreadPages = function() {
             for (let i = 1; i <=goodsContainer.page.count; i++) {
                 const pagesWrapper = document.querySelector('.goods');
@@ -222,12 +223,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
             }
             // console.log(this.goodsObjs);
-        };
+        }
         goodsContainer.completePages = function() {
             goodsContainer.countPages(); // Определяет page.count
             goodsContainer.createPages();
             goodsContainer.spreadPages(); // На этом этапе в вёрстку вставляются карточки товаров через классы
-        };
+        }
     // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней")
     goodsContainer.paginationNumbers = function() {
         this.currentPage = 0; // Перенёс это сюда, чтобы правильно работало скрытие кнопок пагинации
@@ -266,7 +267,7 @@ window.addEventListener('DOMContentLoaded', () => {
             this.paginationSkipping();
         }
         goodsContainer.paginationIni();
-    };
+    }
     // Назначает обработчик на клик по кнопкам пагинации
     goodsContainer.paginationIni = function() {
         // console.log(this.currentPage);
@@ -288,7 +289,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
-    };
+    }
     // Проверка необходимости вставки єлемента "..." между кнопками пагинации
     goodsContainer.paginationSkipping = function() {
         const skipped = this.pagination.template.querySelectorAll('[skipped]');
@@ -312,7 +313,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
         });
-    };
+    }
     // Активируются боковые кнопки переключения страниц:
     goodsContainer.paginationNextPrevIni = function() {
         this.pagination.template.querySelectorAll('a').forEach(el => {
@@ -339,8 +340,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-    };
-    // Формирование массива goodsShow
+    }
+    // Формирует массив goodsShow из goodsArr с учётом применённых фильтров, записывает текущие фильтры в объект:
     goodsContainer.checkFilters = function() {
         const goodsWrapper = document.querySelector('.goods'),
             discountCheckbox = document.querySelector('#discount-checkbox'),
@@ -352,6 +353,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
         let toSort = this.goodsArr,
             toShow = [];
+
+        this.filters = {
+            discount: discountCheckbox.checked,
+            minPrice: min.value,
+            maxPrice: max.value,
+            search: searchInput.value,
+            category: catSelect.value
+        }
 
         function checkDiscount(el) {
             if (discountCheckbox.checked){
@@ -402,14 +411,44 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
         this.goodsShow = toShow;
-    };
+    }
     goodsContainer.togglePerPage = function() {
         document.querySelector('.filter-perPage_select').addEventListener('change', function() {
             goodsContainer.perPage = this.value;
             goodsContainer.completePages();
             goodsContainer.paginationNumbers();
         });
-    };
+    }
+    goodsContainer.toggleFilters = function() {
+        const discountCheckbox = document.querySelector('#discount-checkbox'),
+            min = document.getElementById('min'),
+            max = document.getElementById('max'),
+            searchBtn = document.getElementById('search'),
+            catSelect = document.querySelector('.filter-category_select');
+
+        function checkAll() {
+            goodsContainer.checkFilters();
+            goodsContainer.completePages();
+            goodsContainer.paginationNumbers();
+        }
+
+        discountCheckbox.addEventListener('change', () => {
+            checkAll();
+        });
+    
+        min.addEventListener('change', checkAll);
+        max.addEventListener('change', checkAll);
+    
+        searchBtn.parentElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+            checkAll();
+            // return false; // Надо ли? - НЕТ
+        });
+
+        catSelect.addEventListener('change', () => {
+            checkAll();
+        });
+    }
 
 
 
@@ -426,10 +465,11 @@ window.addEventListener('DOMContentLoaded', () => {
     function createElement(arr) {
         goodsContainer.goodsArr = arr;
         // console.log(goodsContainer.goodsArr);
-        goodsContainer.checkFilters(); // Формирует массив goodsShow из goodsArr с учётом применённых фильтров
+        goodsContainer.checkFilters(); // Формирует массив goodsShow из goodsArr с учётом применённых фильтров, записывает текущие фильтры в объект
         goodsContainer.completePages(); // Определяет page.count (countPages), создаёт страницы (скрытые) (createPages), вставляются карточки товаров (spreadPages)
         goodsContainer.paginationNumbers(); // Создаются и вставляются в вёрстку кнопки пагинации (включая "к первой"/"к последней") + Назначает обработчик на клик по кнопкам пагинации и снимается hidden с активной страницы
         goodsContainer.togglePerPage(); // Активируется работа селекта perPage
+        goodsContainer.toggleFilters(); // Активируется работа инпутов с фильтрами
         goodsContainer.paginationNextPrevIni(); // Активируются боковые кнопки переключения страниц
         //? Стоит ли перенести эти функции в коллбэк loadContent-а?
     }
@@ -537,48 +577,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
         }
 
-        function toggleFilter() {
-            const goodsWrapper = document.querySelector('.goods'),
-                goods = goodsWrapper.querySelectorAll('.productcard'),
-                discountCheckbox = document.querySelector('#discount-checkbox'),
-                min = document.getElementById('min'),
-                max = document.getElementById('max'),
-                searchBtn = document.querySelector('#search'),
-                searchInput = searchBtn.previousElementSibling,
-                catSelect = document.querySelector('.filter-category_select');
-
-            function checkAll() {
-                goodsContainer.checkFilters();
-                goodsContainer.completePages();
-                goodsContainer.paginationNumbers();
-            }
-
-            discountCheckbox.addEventListener('change', () => {
-                checkAll();
-            });
-        
-            min.addEventListener('change', checkAll);
-            max.addEventListener('change', checkAll);
-        
-            searchBtn.parentElement.addEventListener('submit', (e) => {
-                e.preventDefault();
-                checkAll();
-                // return false; // Надо ли? - НЕТ
-            });
-
-            catSelect.addEventListener('change', () => {
-                checkAll();
-            });
-
-        }
-
 
         toggleCart();
         toggleCheckbox();
         sliceTitle();
         toggleSettings();
         toggleCategory();
-        toggleFilter();
     });
 
     
